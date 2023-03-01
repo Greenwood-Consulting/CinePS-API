@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\FilmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
 class Film
@@ -15,15 +16,17 @@ class Film
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre du film est obligatoire")]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit faire au moins {{ limit }} caractères", maxMessage: "Le titre ne peut pas faire plus de {{ limit }} caractères")]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $sortie_film = null;
+    #[ORM\Column]
+    private ?int $sortie_film = null;
 
-    #[ORM\Column(length: 500)]
+    #[ORM\Column(length: 600)]
     private ?string $imdb = null;
 
     public function getId(): ?int
@@ -55,12 +58,12 @@ class Film
         return $this;
     }
 
-    public function getSortieFilm(): ?\DateTimeInterface
+    public function getSortieFilm(): ?int
     {
         return $this->sortie_film;
     }
 
-    public function setSortieFilm(\DateTimeInterface $sortie_film): self
+    public function setSortieFilm(int $sortie_film): self
     {
         $this->sortie_film = $sortie_film;
 

@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\PropositionRepository;
+use App\Entity\Semaine;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PropositionRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PropositionRepository::class)]
 class Proposition
@@ -13,38 +15,45 @@ class Proposition
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $semaine = null;
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups (["getSemaines"])]
+    private ?Semaine $semaine = null;
 
-    #[ORM\Column]
-    private ?int $film = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Film $film = null;
 
     #[ORM\Column]
     private ?int $score = null;
+
+    #[ORM\ManyToOne(inversedBy: 'Proposition')]
+    #[ORM\JoinColumn(nullable: false)]
+    
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSemaine(): ?int
+    public function getSemaine(): ?Semaine
     {
         return $this->semaine;
     }
 
-    public function setSemaine(?int $semaine): self
+    public function setSemaine(Semaine $semaine): self
     {
         $this->semaine = $semaine;
 
         return $this;
     }
 
-    public function getFilm(): ?int
+    public function getFilm(): ?Film
     {
         return $this->film;
     }
 
-    public function setFilm(int $film): self
+    public function setFilm(?Film $film): self
     {
         $this->film = $film;
 
@@ -62,4 +71,5 @@ class Proposition
 
         return $this;
     }
+
 }

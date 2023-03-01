@@ -21,6 +21,13 @@ class FilmRepository extends ServiceEntityRepository
         parent::__construct($registry, Film::class);
     }
 
+    public function findAllWithPagination($page, $limit) {
+        $qb = $this->createQueryBuilder('f')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+        return $qb->getQuery()->getResult();
+    }
+
     public function save(Film $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);

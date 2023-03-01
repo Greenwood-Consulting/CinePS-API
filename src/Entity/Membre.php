@@ -25,6 +25,9 @@ class Membre
     #[ORM\Column(length: 255)]
     private ?string $mdp = null;
 
+    #[ORM\ManyToOne(inversedBy: 'Membre')]
+    #[ORM\JoinColumn(nullable: false)]
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,4 +80,5 @@ class Membre
 
         return $this;
     }
+
 }
