@@ -6,6 +6,39 @@ use App\Repository\FilmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotatiion\Since;
+
+
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "detailFilm",
+ *          parameters = { "id" = "expr(object.getId())" }
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getFilms")
+ * )
+ *
+ *  * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "deleteFilm",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getFilms", excludeIf = "expr(not is_granted('ROLE_ADMIN'))"),
+ * )
+ *
+ * @Hateoas\Relation(
+ *      "update",
+ *      href = @Hateoas\Route(
+ *          "updateFilm",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getFilms", excludeIf = "expr(not is_granted('ROLE_ADMIN'))"),
+ * )
+ *
+ */
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
 class Film
@@ -28,6 +61,9 @@ class Film
 
     #[ORM\Column(length: 600)]
     private ?string $imdb = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $resume = null;
 
     public function getId(): ?int
     {
@@ -78,6 +114,18 @@ class Film
     public function setImdb(string $imdb): self
     {
         $this->imdb = $imdb;
+
+        return $this;
+    }
+
+    public function getResume(): ?string
+    {
+        return $this->resume;
+    }
+
+    public function setResume(string $resume): self
+    {
+        $this->resume = $resume;
 
         return $this;
     }
