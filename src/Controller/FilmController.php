@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Film;
+use App\Service\PrintFilm;
+use App\Service\HelloWorld;
 use App\Repository\FilmRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -113,6 +115,13 @@ class FilmController extends AbstractController
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
+
+    #[Route('/printFilm', name: 'printFilm', methods: ['GET'])]
+    public function new(PrintFilm $printFilm): Response
+    {
+        $message = $printFilm->getFilm();
+        return $message;
+    }
 }
 
-
+?>

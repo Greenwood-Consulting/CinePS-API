@@ -66,7 +66,7 @@ class AppFixtures extends Fixture
                 $manager->persist($film);
             }
 
-            $manager->flush();
+            
             // //Création utilisateur Jessy
             // $membre_jessy = new Membre();
             // $membre_jessy->setPrenom("Jessy");
@@ -109,14 +109,16 @@ class AppFixtures extends Fixture
             // $manager->persist($film_iron_man);
 
 
-            // //Création d'une Semaine 1 
-            // $semaine1 = new Semaine();
-            // $semaine1->setJour(new \DateTime('2023-01-30'));
-            // $semaine1->setProposeur("Coco");
-            // $semaine1->setPropositionTermine(false);
-            // $semaine1->setTheme("Marvel");
-            // $manager->persist($semaine1);
-
+            // Création d'une Semaine 1 
+            for ($i = 0; $i < 20; $i++) {
+                $semaine = new Semaine();
+                $semaine->setJour(new \DateTime('2023-01-30'));
+                $semaine->setProposeur("Prenom" . $i);
+                $semaine->setPropositionTermine(false);
+                $semaine->setTheme("Marvel");
+                $manager->persist($semaine);
+            }
+            
             // //Création d'une Semaine 2
             // $semaine2 = new Semaine();
             // $semaine2->setJour(new \DateTime('2023-02-30'));

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+
+use App\Service\PrintSemaine;
 use App\Repository\SemaineRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,4 +35,14 @@ class SemaineController extends AbstractController
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
+
+    #[Route('/printSemaine', name: 'printSemaine', methods: ['GET'])]
+    public function printSemaine(PrintSemaine $printSemaine, SerializerInterface $serializer): JsonResponse
+    {
+        $semaineList = $printSemaine->getSemaine();
+        $jsonSemainelist = $serializer->serialize($semaineList, 'json');
+        return new JsonResponse ($jsonSemainelist, Response::HTTP_OK, [], true);
+
+    }
 }
+?>
