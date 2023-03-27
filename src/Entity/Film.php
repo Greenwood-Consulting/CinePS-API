@@ -62,9 +62,6 @@ class Film
     #[ORM\Column(length: 600)]
     private ?string $imdb = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $resume = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -114,18 +111,6 @@ class Film
     public function setImdb(string $imdb): self
     {
         $this->imdb = $imdb;
-
-        return $this;
-    }
-
-    public function getResume(): ?string
-    {
-        return $this->resume;
-    }
-
-    public function setResume(string $resume): self
-    {
-        $this->resume = $resume;
 
         return $this;
     }

@@ -39,6 +39,24 @@ class PropositionRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+    * @return Proposition[] Returns an array of Proposition objects
+    */
+   public function findBySemaine($value): array
+   {
+       return $this->createQueryBuilder('p')
+           ->andWhere('p.semaine = :val')
+           ->setParameter('val', $value)
+           ->orderBy('p.id', 'ASC')
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
+
+
+
+
 //    /**
 //     * @return Proposition[] Returns an array of Proposition objects
 //     */

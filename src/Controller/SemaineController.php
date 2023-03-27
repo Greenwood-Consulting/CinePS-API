@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Service\PrintSemaine;
+use App\Service\SemaineService;
 use App\Repository\SemaineRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,15 +34,15 @@ class SemaineController extends AbstractController
             $jsonSemaine = $serializer->serialize($semaine, 'json');
             return new JsonResponse($jsonSemaine, Response::HTTP_OK, [], true);
         }
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        return new JsonResponse(null, Response::HTTP_NOT_FOUND);    
     }
 
-    #[Route('/printSemaine', name: 'printSemaine', methods: ['GET'])]
-    public function printSemaine(PrintSemaine $printSemaine, SerializerInterface $serializer): JsonResponse
+    #[Route('/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
+    public function filmsProposes(int $id_semaine, SemaineService $semaineService, SerializerInterface $serializer): JsonResponse
     {
-        $semaineList = $printSemaine->getSemaine();
-        $jsonSemainelist = $serializer->serialize($semaineList, 'json');
-        return new JsonResponse ($jsonSemainelist, Response::HTTP_OK, [], true);
+        $filmList = $semaineService->getFilmsProposes($id_semaine);
+        $jsonFilmlist = $serializer->serialize($filmList, 'json');
+        return new JsonResponse ($jsonFilmlist, Response::HTTP_OK, [], true);
 
     }
 }
