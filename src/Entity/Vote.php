@@ -2,11 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Membre;
-use App\Entity\Semaine;
-use App\Entity\Proposition;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\VoteRepository;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
 class Vote
@@ -16,9 +13,9 @@ class Vote
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Semaine $Semaine = null;
+    private ?Semaine $semaine = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -38,12 +35,12 @@ class Vote
 
     public function getSemaine(): ?Semaine
     {
-        return $this->Semaine;
+        return $this->semaine;
     }
 
-    public function setSemaine(Semaine $Semaine): self
+    public function setSemaine(?Semaine $semaine): self
     {
-        $this->Semaine = $Semaine;
+        $this->semaine = $semaine;
 
         return $this;
     }
