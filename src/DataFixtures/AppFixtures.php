@@ -7,11 +7,13 @@ use DateTime;
 use App\Entity\Film;
 use App\Entity\User;
 use App\Entity\Vote;
+use App\Entity\AVote;
 use App\Entity\Membre;
 use App\Entity\Semaine;
 use App\Entity\Proposition;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use JMS\Serializer\Tests\Fixtures\DocBlockType\Collection\Product;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
@@ -131,17 +133,26 @@ class AppFixtures extends Fixture
             $semaine2 = new Semaine();
             $semaine2->setJour(new \DateTime('2023-02-30'));
             $semaine2->setProposeur("Jessy");
-            $semaine2->setPropositionTermine(false);
+            $semaine2->setPropositionTermine(true);
             $semaine2->setTheme("DC");
             $manager->persist($semaine2);
 
-            // //Création d'une Semaine 3
-            // $semaine3 = new Semaine();
-            // $semaine3->setJour(new \DateTime('2023-03-30'));
-            // $semaine3->setProposeur("Robin");
-            // $semaine3->setPropositionTermine(false);
-            // $semaine3->setTheme("NoTheme");
-            // $manager->persist($semaine3);
+            //Création d'une Semaine 3
+            $semaine3 = new Semaine();
+            $semaine3->setJour(new \DateTime('2023-04-21'));
+            $semaine3->setProposeur("Robin");
+            $semaine3->setPropositionTermine(true);
+            $semaine3->setTheme("NoTheme");
+            $manager->persist($semaine3);
+
+            //Création d'une semaine 4
+            $semaine4 = new Semaine();
+            $semaine4->setJour(new \DateTime('2023-05-05'));
+            $semaine4->setProposeur("Coco");
+            $semaine4->setPropositionTermine(false);
+            $semaine4->setTheme("Marvel");
+            $manager->persist($semaine4);
+
 
 
 
@@ -159,42 +170,88 @@ class AppFixtures extends Fixture
             //Création d'une deuxième proposition
             $proposition1 = new Proposition();
             $proposition1->setScore(36);
-            $proposition1->setSemaine($semaine2);
+            $proposition1->setSemaine($semaine3);
             $proposition1->setFilm($film_thor);
             $manager->persist($proposition1);
 
             //Création d'une deuxième proposition
             $proposition2 = new Proposition();
             $proposition2->setScore(36);
-            $proposition2->setSemaine($semaine2);
+            $proposition2->setSemaine($semaine3);
             $proposition2->setFilm($film_iron_man);
             $manager->persist($proposition2);
 
             //Création d'une deuxième proposition
             $proposition3 = new Proposition();
             $proposition3->setScore(36);
-            $proposition3->setSemaine($semaine2);
+            $proposition3->setSemaine($semaine3);
             $proposition3->setFilm($film_hulk);
             $manager->persist($proposition3);
 
 
 
-            // //Création d'un vote
-            // $vote = new Vote();
-            // $vote->setVote(1);
-            // $vote->setMembre($membre_jessy);
-            // $vote->setSemaine($semaine2);
-            // $vote->setProposition($proposition);
-            // $manager->persist($vote);
+            // // //Création d'un vote
+            // $vote_coco = new Vote();
+            // $vote_coco->setVote(1);
+            // $vote_coco->setMembre($membre_coco);
+            // $vote_coco->setSemaine($semaine2);
+            // $vote_coco->setProposition($proposition1);
+            // $manager->persist($vote_coco);
+
+            // // //Création d'un autre vote
+            // $vote_coco2 = new Vote();
+            // $vote_coco2->setVote(2);
+            // $vote_coco2->setMembre($membre_coco);
+            // $vote_coco2->setSemaine($semaine2);
+            // $vote_coco2->setProposition($proposition2);
+            // $manager->persist($vote_coco2);
 
             // //Création d'un autre vote
-            // // $vote2 = new Vote();
-            // // $vote2->setVote(2);
-            // // $vote2->setMembre($membre_jessy);
-            // // $vote2->setSemaine($semaine2);
-            // // $vote2->setProposition($proposition2);
-            // // $manager->persist($vote2);
+            // $vote_coco3 = new Vote();
+            // $vote_coco3->setVote(3);
+            // $vote_coco3->setMembre($membre_coco);
+            // $vote_coco3->setSemaine($semaine2);
+            // $vote_coco3->setProposition($proposition3);
+            // $manager->persist($vote_coco3);
+            
+            
 
+            // //Création d'un autre vote
+            $vote_robin = new Vote();
+            $vote_robin->setVote(1);
+            $vote_robin->setMembre($membre_robin);
+            $vote_robin->setSemaine($semaine3);
+            $vote_robin->setProposition($proposition1);
+            $manager->persist($vote_robin);
+
+            //Création d'un autre vote
+            $vote_robin2 = new Vote();
+            $vote_robin2->setVote(2);
+            $vote_robin2->setMembre($membre_robin);
+            $vote_robin2->setSemaine($semaine3);
+            $vote_robin2->setProposition($proposition2);
+            $manager->persist($vote_robin2);
+
+            //Création d'un autre vote
+            $vote_robin3 = new Vote();
+            $vote_robin3->setVote(3);
+            $vote_robin3->setMembre($membre_robin);
+            $vote_robin3->setSemaine($semaine3);
+            $vote_robin3->setProposition($proposition3);
+            $manager->persist($vote_robin3);
+            
+            // //Coco A voté
+            // $coco_a_vote = new AVote();
+            // $coco_a_vote->setVotant($membre_coco);
+            // $coco_a_vote->setSemaine($semaine3);
+            // $manager->persist($coco_a_vote);
+
+            //Robin A voté
+            $robin_a_vote = new AVote();
+            $robin_a_vote->setVotant($membre_robin);
+            $robin_a_vote->setSemaine($semaine3);
+            $manager->persist($robin_a_vote);
+ 
 
 
             
