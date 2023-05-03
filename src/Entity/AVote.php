@@ -17,9 +17,9 @@ class AVote
     #[ORM\JoinColumn(nullable: false)]
     private ?Membre $votant = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Semaine $Semaine = null;
+    private ?Semaine $semaine = null;
 
     public function getId(): ?int
     {
@@ -40,12 +40,12 @@ class AVote
 
     public function getSemaine(): ?Semaine
     {
-        return $this->Semaine;
+        return $this->semaine;
     }
 
-    public function setSemaine(Semaine $Semaine): self
+    public function setSemaine(Semaine $semaine): self
     {
-        $this->Semaine = $Semaine;
+        $this->semaine = $semaine;
 
         return $this;
     }
