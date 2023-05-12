@@ -6,7 +6,6 @@ namespace App\Controller;
 use App\Entity\Semaine;
 use App\Service\PrintSemaine;
 use App\Service\SemaineService;
-use App\Controller\SemaineController;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
