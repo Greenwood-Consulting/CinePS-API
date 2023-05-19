@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PropositionController extends AbstractController
 {
+
+    //Retourne toutes les propositions
     #[Route('/api/propositions', name: 'app_proposition')]
     public function getAllPropositions(PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
     {
@@ -23,6 +25,7 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
     }
 
+    //Retourne une proposition selon l'id
     #[Route('/api/propositions/{id}', name: 'detailProposition', methods: ['GET'])]
     public function getDetailFilm(int $id, SerializerInterface $serializer, PropositionRepository $propostionRepository): JsonResponse
     {
@@ -33,15 +36,6 @@ class PropositionController extends AbstractController
             return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
         }
         return new JsonResponse(["error" => "Not Found"], 404);
-    }
-
-    #[Route('/api/propositions/{id}', name: 'deleteProposition', methods: ['DELETE'])]
-    public function deleteProposition(Proposition $proposition, EntityManagerInterface $em): JsonResponse
-    {
-        $em->remove($proposition);
-        $em->flush();
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
 }

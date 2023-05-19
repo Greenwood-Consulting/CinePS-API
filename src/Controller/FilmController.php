@@ -22,47 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class FilmController extends AbstractController
 {
     
-    #[Route('/api/films', name: 'app_film', methods: ['GET'])]
-    public function getAllFilms(FilmRepository $filmRepository, SerializerInterface $serializer, Request $request, TagAwareCacheInterface $cachePool): JsonResponse
-    {
-
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 3);
-
-        //$filmList = $filmRepository->findAllWithPagination($page, $limit);
-        $idCache = "getAllFilms-" . $page . "-" . $limit;
-        $filmList = $cachePool->get($idCache, function (ItemInterface $item) use ($filmRepository, $page, $limit) {
-            echo ("L'ELEMENT N'EST PAS ENCORE EN CACHE !\n");
-            $item->tag("filmsCache");
-            return $filmRepository->findAllWithPagination($page, $limit);
-        });
-
-        $jsonFilmList = $serializer->serialize($filmList, 'json');
-        return new JsonResponse($jsonFilmList, Response::HTTP_OK, [], true);
-    }
-
-
-    #[Route('/api/films/{id}', name: 'detailFilm', methods: ['GET'])]
-    public function getDetailFilm(int $id, SerializerInterface $serializer, FilmRepository $filmRepository): JsonResponse
-    {
-
-        $film = $filmRepository->find($id);
-        if($film) {
-            $jsonFilm = $serializer->serialize($film, 'json');
-            return new JsonResponse($jsonFilm, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(["error" => "Not Found"], 404);
-    }
-
-    #[Route('/api/films/{id}', name: 'deleteFilm', methods: ['DELETE'])]
-    public function deleteFilm(Film $film, EntityManagerInterface $em): JsonResponse
-    {
-        $em->remove($film);
-        $em->flush();
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
-    }
-    
+    //Permet à l'admin d'ajouter un film
     #[Route('/api/films', name:"createFilm", methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour proposer un film')]
     public function createFilm(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator): JsonResponse 
@@ -88,6 +48,9 @@ class FilmController extends AbstractController
 
         return new JsonResponse($jsonFilm, Response::HTTP_CREATED, ["Location" => $location], true);
    }
+
+
+    //Permet à l'admin de modifier les films
     #[Route('/api/films/{id}', name:"updateFilm", methods:['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour éditer un film')]
     public function updateFilm(Request $request, SerializerInterface $serializer, Film $currentFilm, EntityManagerInterface $em, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse 
@@ -114,13 +77,6 @@ class FilmController extends AbstractController
         $cache->invalidateTags(["filmsCache"]);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
-    }
-
-    #[Route('/printFilm', name: 'printFilm', methods: ['GET'])]
-    public function new(PrintFilm $printFilm): Response
-    {
-        $message = $printFilm->getFilm();
-        return $message;
     }
 }
 

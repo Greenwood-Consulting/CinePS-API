@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class VoteController extends AbstractController
 {
+
+    //Retourne tout les votes
     #[Route('/api/votes', name: 'app_vote')]
     public function getAllVotes(VoteRepository $voteRepository, SerializerInterface $serializer): JsonResponse
     {
@@ -24,18 +26,6 @@ class VoteController extends AbstractController
 
         $jsonVoteList = $serializer->serialize($voteList, 'json');
         return new JsonResponse($jsonVoteList, Response::HTTP_OK, [], true);
-    }
-
-    #[Route('/api/propositions/{id}', name: 'detailProposition', methods: ['GET'])]
-    public function getDetailFilm(int $id, SerializerInterface $serializer, PropositionRepository $propostionRepository): JsonResponse
-    {
-
-        $proposition = $propostionRepository->find($id);
-        if($proposition) {
-            $jsonProposition = $serializer->serialize($proposition, 'json');
-            return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(["error" => "Not Found"], 404);
     }
 
 
@@ -56,7 +46,7 @@ class VoteController extends AbstractController
         return new JsonResponse ($jsonResultatsVotes, Response::HTTP_OK, [], true);
     }
 
-    //Afficher les film victorieux de la semaine id_semaine
+    //Afficher le film victorieux de la semaine id_semaine
     #[Route('/filmVictorieux/{id_semaine}', name:'FilmVictorieux', methods: ['GET'])]
     public function filmVictorieux(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
