@@ -14,17 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PropositionController extends AbstractController
 {
 
-    //Retourne toutes les propositions
-    #[Route('/api/propositions', name: 'app_proposition')]
-    public function getAllPropositions(PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
-    {
-
-        $propositionList = $propositionRepository->findAll();
-
-        $jsonPropositionList = $serializer->serialize($propositionList, 'json');
-        return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
-    }
-
     //Retourne une proposition selon l'id
     #[Route('/api/propositions/{id}', name: 'detailProposition', methods: ['GET'])]
     public function getDetailFilm(int $id, SerializerInterface $serializer, PropositionRepository $propostionRepository): JsonResponse
