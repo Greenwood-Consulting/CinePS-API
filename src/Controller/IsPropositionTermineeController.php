@@ -42,7 +42,7 @@ class IsPropositionTermineeController extends AbstractController
     }
 
     //Indique si le vote pour la semaine $id_semaine est terminée
-    #[Route('/isVoteTermine/{id_semaine}', name: 'app_is_proposition_terminee')]
+    #[Route('/isVoteTermine/{id_semaine}', name: 'is_vote_termine')]
     public function isVoteTermineCetteSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         ///Récupère le nombre de votants de la semaine $id_semaine
