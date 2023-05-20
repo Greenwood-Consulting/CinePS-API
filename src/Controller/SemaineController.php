@@ -29,7 +29,7 @@ class SemaineController extends AbstractController
     }
 
 
-    #[Route('/api/semaines/{id}', name: 'detailSemaine', methods: ['GET'])]
+    #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
     public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
 
