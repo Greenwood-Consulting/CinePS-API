@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use DateTime;
 
 
 class SemaineController extends AbstractController
@@ -32,13 +33,53 @@ class SemaineController extends AbstractController
     #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
     public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
-
         $semaine = $semaineRepository->find($id);
         if($semaine) {
             $jsonSemaine = $serializer->serialize($semaine, 'json');
             return new JsonResponse($jsonSemaine, Response::HTTP_OK, [], true);
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);    
+    }
+
+    // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
+    #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
+    public function getIdCurrentSemaine(SerializerInterface $serializer, EntityManagerInterface $entityManager, SemaineRepository $semaineRepository): JsonResponse
+    {
+        // Date du jour
+        $curdate=new DateTime();
+
+        // calcul de la date de fin de la période de vote
+        $fin_periode_vote = new DateTime("Fri 14:00");
+        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
+
+        // conversion de la date de fin en timestamp
+        $deadline_vote = strtotime($fin_periode_vote);
+        $deadline_vote = $deadline_vote*1000;
+
+        // Get vendredi id_current_semaine
+        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
+            $friday_current_semaine = $curdate->format('Y-m-d');
+        } else { // Sinon id_current_semaine est défini par vendredi prochain
+            $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
+        }
+
+        //Récupère la propositionTerminé de id_semaine
+        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
+        $queryBuilder_get_id_current_semaine->select('s.id')
+        ->from(Semaine::class, 's')
+        ->where('s.jour = :jour')
+        ->setParameter('jour', $friday_current_semaine);
+
+        $result_id_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
+        
+        if ($result_id_current_semaine){
+            $id_current_semaine = $result_id_current_semaine[0]['id'];
+        } else { // la semaine courrant n'exite pas encore dans la base de données
+            $id_current_semaine = 0;
+        }
+        $array_id_current_semaine = array("id_current_semaine" => $id_current_semaine);
+        $json_id_current_semaine = $serializer->serialize($array_id_current_semaine, 'json');
+        return new JsonResponse ($json_id_current_semaine, Response::HTTP_OK, [], true);
     }
 
     #[Route('/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
