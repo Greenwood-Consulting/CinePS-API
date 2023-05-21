@@ -34,7 +34,7 @@ class GetProposeurController extends AbstractController
 
 
     //Work In Progress
-    #[Route('/getCurrentProposeur', name: 'app_get_proposeur')]
+    #[Route('/getCurrentProposeur/{id_semaine}', name: 'app_get_current_proposeur')]
     public function getCurrentProposeur(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         //Récupère la propositionTerminé de id_semaine

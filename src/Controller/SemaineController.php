@@ -4,9 +4,9 @@ namespace App\Controller;
 
 
 use App\Entity\Semaine;
-use App\Service\PrintSemaine;
-use App\Service\SemaineService;
+use App\Entity\Vote;
 use App\Repository\SemaineRepository;
+use App\Repository\MembreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use DateTime;
-
 
 class SemaineController extends AbstractController
 {
@@ -28,7 +27,6 @@ class SemaineController extends AbstractController
         $jsonSemaineList = $serializer->serialize($semaineList, 'json');
         return new JsonResponse($jsonSemaineList, Response::HTTP_OK, [], true);
     }
-
 
     #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
     public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
@@ -117,5 +115,52 @@ class SemaineController extends AbstractController
         return new JsonResponse ($jsonResultatsProposeurs, Response::HTTP_OK, [], true);
 
     }
+
+    // Votes de la semaine
+    #[Route('/votes/{id_semaine}', name:'votes', methods: ['GET'])]
+    public function votes(int $id_semaine, MembreRepository $membreRepository, PropositionRepository $propositionRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    {
+        // Récupération des propositions de la semaine
+        $propositions = $propositionRepository->findBySemaine($id_semaine);
+        $jsonPropositions = $serializer->serialize($propositions, 'json');
+        $arrayPropositions = json_decode($jsonPropositions, true);
+
+        $array_propositions_avec_votes = array();
+        foreach($arrayPropositions as $proposition){
+
+            $membres = $membreRepository->findAll();
+            $jsonMembres = $serializer->serialize($membres, 'json');
+            $arrayMembres = json_decode($jsonMembres, true);
+
+            $proposition_votes = array(); // tableau dans lequel on stocke les votes de cette proposition
+            foreach($arrayMembres as $membre){
+                // Résupérer le vote de l'utilisateur pour cette proposition
+                $queryBuilder_get_vote = $entityManager->createQueryBuilder();
+                $queryBuilder_get_vote->select('v.vote')
+                ->from(Vote::class, 'v')
+                ->where('v.proposition = :id_proposition')
+                ->andWhere('v.membre = :id_membre')
+                ->setParameters(array('id_proposition' => $proposition['id'], 'id_membre' => $membre['id']));
+        
+                $resultat_vote = $queryBuilder_get_vote->getQuery()->getResult();
+                $jsonResultatVote = $serializer->serialize($resultat_vote, 'json');
+                $arrayVote = json_decode($jsonResultatVote, true);
+
+                if (empty($arrayVote)){
+                    $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => '');;
+                } else {
+                    $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => $arrayVote[0]['vote']);
+                }
+            }
+            $proposition['vote'] = $proposition_votes;
+            $array_propositions_avec_votes[] = $proposition;
+        } // fin du parcours des propositions
+
+        $jsonResultatsPropositiuonsAvecVotes = $serializer->serialize($array_propositions_avec_votes, 'json');
+        return new JsonResponse ($jsonResultatsPropositiuonsAvecVotes, Response::HTTP_OK, [], true);
+
+    }
+
+
 }
 ?>
