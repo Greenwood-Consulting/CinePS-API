@@ -16,7 +16,7 @@ class PropositionController extends AbstractController
 
     //Retourne une proposition selon l'id
     #[Route('/api/propositions/{id}', name: 'detailProposition', methods: ['GET'])]
-    public function getDetailFilm(int $id, SerializerInterface $serializer, PropositionRepository $propostionRepository): JsonResponse
+    public function getProposition(int $id, SerializerInterface $serializer, PropositionRepository $propostionRepository): JsonResponse
     {
 
         $proposition = $propostionRepository->find($id);
