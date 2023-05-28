@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 
-use App\Entity\Semaine;
+use DateTime;
 use App\Entity\Vote;
-use App\Repository\SemaineRepository;
+use App\Entity\Semaine;
 use App\Repository\MembreRepository;
+use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,34 +15,56 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use DateTime;
 
 class SemaineController extends AbstractController
 {
-    #[Route('/api/semaines', name: 'app_semaine')]
-    public function getAllSemaines(SemaineRepository $semaineRepository, SerializerInterface $serializer): JsonResponse
-    {
-
-        $semaineList = $semaineRepository->findAll();
-
-        $jsonSemaineList = $serializer->serialize($semaineList, 'json');
-        return new JsonResponse($jsonSemaineList, Response::HTTP_OK, [], true);
-    }
-
     #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
     public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
         $semaine = $semaineRepository->find($id);
         if($semaine) {
-            $jsonSemaine = $serializer->serialize($semaine, 'json');
+            $jsonSemaine = $serializer->serialize($semaine, 'json', ['groups' => 'getPropositions']);
             return new JsonResponse($jsonSemaine, Response::HTTP_OK, [], true);
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);    
     }
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
+    #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
+    public function getCurrentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
+    {
+        // Date du jour
+        $curdate=new DateTime();
+
+        // calcul de la date de fin de la période de vote
+        $fin_periode_vote = new DateTime("Fri 14:00");
+        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
+
+        // conversion de la date de fin en timestamp
+        $deadline_vote = strtotime($fin_periode_vote);
+        $deadline_vote = $deadline_vote*1000;
+
+        // Get vendredi id_current_semaine
+        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
+            $friday_current_semaine = $curdate;
+        } else { // Sinon id_current_semaine est défini par vendredi prochain
+            $friday_current_semaine = $curdate->modify('next friday');
+        }
+
+        //Récupère la propositionTerminé de id_semaine
+        $currentSemaine = $semaineRepository->findByJour($friday_current_semaine);
+
+        if($currentSemaine) {
+            $jsonFilmProposes = $serializer->serialize($currentSemaine, 'json', ['groups' => 'getPropositions']);
+            return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
+        } else {
+            return new JsonResponse(["error" => "Not Found"], 404);
+        }
+    }
+
+    // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
-    public function getIdCurrentSemaine(SerializerInterface $serializer, EntityManagerInterface $entityManager, SemaineRepository $semaineRepository): JsonResponse
+    public function getIdCurrentSemaine(SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
     {
         // Date du jour
         $curdate=new DateTime();
@@ -80,52 +103,52 @@ class SemaineController extends AbstractController
         return new JsonResponse ($json_id_current_semaine, Response::HTTP_OK, [], true);
     }
 
-        // Retourne l'onjet de la semaine en cours
-        #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
-        public function getAnciennesSemaines(SerializerInterface $serializer, EntityManagerInterface $entityManager, SemaineRepository $semaineRepository): JsonResponse
-        {
-            // TODO Factoriser le calcul du vendredi courant ?
-            // Date du jour
-            $curdate=new DateTime();
-    
-            // calcul de la date de fin de la période de vote
-            $fin_periode_vote = new DateTime("Fri 14:00");
-            $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
-    
-            // conversion de la date de fin en timestamp
-            $deadline_vote = strtotime($fin_periode_vote);
-            $deadline_vote = $deadline_vote*1000;
-    
-            // Get vendredi id_current_semaine
-            if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
-                $friday_current_semaine = $curdate->format('Y-m-d');
-            } else { // Sinon id_current_semaine est défini par vendredi prochain
-                $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
-            }
-    
-            //Récupère la propositionTerminé de id_semaine
-            $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-            $queryBuilder_get_id_current_semaine->select('s')
-            ->from(Semaine::class, 's')
-            ->where('s.jour < :jour')
-            ->orderBy('s.jour', 'DESC')
-            ->setParameter('jour', $friday_current_semaine);
-    
-            $result_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-            
-            if($result_current_semaine) {
-                $jsonProposition = $serializer->serialize($result_current_semaine, 'json');
-                return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-            }
-            return new JsonResponse(["error" => "Not Found"], 404);
+    // Retourne l'onjet de la semaine en cours
+    #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
+    public function getAnciennesSemaines(SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // TODO Factoriser le calcul du vendredi courant ?
+        // Date du jour
+        $curdate=new DateTime();
+
+        // calcul de la date de fin de la période de vote
+        $fin_periode_vote = new DateTime("Fri 14:00");
+        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
+
+        // conversion de la date de fin en timestamp
+        $deadline_vote = strtotime($fin_periode_vote);
+        $deadline_vote = $deadline_vote*1000;
+
+        // Get vendredi id_current_semaine
+        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
+            $friday_current_semaine = $curdate->format('Y-m-d');
+        } else { // Sinon id_current_semaine est défini par vendredi prochain
+            $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
         }
+
+        //Récupère la propositionTerminé de id_semaine
+        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
+        $queryBuilder_get_id_current_semaine->select('s')
+        ->from(Semaine::class, 's')
+        ->where('s.jour < :jour')
+        ->orderBy('s.jour', 'DESC')
+        ->setParameter('jour', $friday_current_semaine);
+
+        $result_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
+        
+        if($result_current_semaine) {
+            $jsonProposition = $serializer->serialize($result_current_semaine, 'json', ['groups' => 'getPropositions']);
+            return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
+        }
+        return new JsonResponse(["error" => "Not Found"], 404);
+    }
     
 
     #[Route('/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
     public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
     {
         $filmsProposes = $propositionRepository->findBySemaine($id_semaine);
-        $jsonFilmProposes = $serializer->serialize($filmsProposes, 'json');
+        $jsonFilmProposes = $serializer->serialize($filmsProposes, 'json', ['groups' => 'getPropositions']);
         return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
 
     }
@@ -201,7 +224,6 @@ class SemaineController extends AbstractController
         return new JsonResponse ($jsonResultatsPropositiuonsAvecVotes, Response::HTTP_OK, [], true);
 
     }
-
 
 }
 ?>

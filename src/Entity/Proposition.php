@@ -13,39 +13,25 @@ class Proposition
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getPropositions"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups (["getSemaines"])]
-    private ?Semaine $semaine = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["getPropositions"])]
     private ?Film $film = null;
 
     #[ORM\Column]
+    #[Groups(["getPropositions"])]
     private ?int $score = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Proposition')]
+    #[ORM\ManyToOne(inversedBy: 'propositions')]
     #[ORM\JoinColumn(nullable: false)]
-    
+    private ?Semaine $semaine = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSemaine(): ?Semaine
-    {
-        return $this->semaine;
-    }
-
-    public function setSemaine(Semaine $semaine): self
-    {
-        $this->semaine = $semaine;
-
-        return $this;
     }
 
     public function getFilm(): ?Film
@@ -68,6 +54,18 @@ class Proposition
     public function setScore(int $score): self
     {
         $this->score = $score;
+
+        return $this;
+    }
+
+    public function getSemaine(): ?Semaine
+    {
+        return $this->semaine;
+    }
+
+    public function setSemaine(?Semaine $semaine): self
+    {
+        $this->semaine = $semaine;
 
         return $this;
     }

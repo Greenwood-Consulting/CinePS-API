@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\MembreRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MembreRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MembreRepository::class)]
 class Membre
@@ -11,9 +14,11 @@ class Membre
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getPropositions"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["getPropositions"])]
     private ?string $Nom = null;
 
     #[ORM\Column(length: 255)]
@@ -24,6 +29,14 @@ class Membre
 
     #[ORM\Column(length: 255)]
     private ?string $mdp = null;
+
+    #[ORM\OneToMany(mappedBy: 'votant', targetEntity: AVote::class, orphanRemoval: true)]
+    private Collection $no;
+
+    public function __construct()
+    {
+        $this->no = new ArrayCollection();
+    }
 
     #[ORM\ManyToOne(inversedBy: 'Membre')]
     #[ORM\JoinColumn(nullable: false)]
@@ -77,6 +90,36 @@ class Membre
     public function setMdp(string $mdp): self
     {
         $this->mdp = $mdp;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AVote>
+     */
+    public function getNo(): Collection
+    {
+        return $this->no;
+    }
+
+    public function addNo(AVote $no): self
+    {
+        if (!$this->no->contains($no)) {
+            $this->no->add($no);
+            $no->setVotant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNo(AVote $no): self
+    {
+        if ($this->no->removeElement($no)) {
+            // set the owning side to null (unless already changed)
+            if ($no->getVotant() === $this) {
+                $no->setVotant(null);
+            }
+        }
 
         return $this;
     }

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\FilmRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\FilmRepository;
 use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotatiion\Since;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -51,15 +51,19 @@ class Film
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre du film est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit faire au moins {{ limit }} caractères", maxMessage: "Le titre ne peut pas faire plus de {{ limit }} caractères")]
+    #[Groups(["getPropositions"])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(["getPropositions"])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
+    #[Groups(["getPropositions"])]
     private ?int $sortie_film = null;
 
     #[ORM\Column(length: 600)]
+    #[Groups(["getPropositions"])]
     private ?string $imdb = null;
 
     public function getId(): ?int
