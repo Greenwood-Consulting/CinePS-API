@@ -3,23 +3,16 @@ namespace App\Service;
 
 use DateTime;
 use App\Entity\Semaine;
+use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CurrentSemaine
 {
 
-    public function getIdCurrentSemaine(EntityManagerInterface $entityManager): int
+    public function getFridayCurrentSemaine(): string
     {
         // Date du jour
         $curdate=new DateTime();
-
-        // calcul de la date de fin de la période de vote
-        $fin_periode_vote = new DateTime("Fri 14:00");
-        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
-
-        // conversion de la date de fin en timestamp
-        $deadline_vote = strtotime($fin_periode_vote);
-        $deadline_vote = $deadline_vote*1000;
 
         // Get vendredi id_current_semaine
         if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
@@ -27,6 +20,13 @@ class CurrentSemaine
         } else { // Sinon id_current_semaine est défini par vendredi prochain
             $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
         }
+
+        return $friday_current_semaine;
+    }
+
+    public function getIdCurrentSemaine(EntityManagerInterface $entityManager): int
+    {
+        $friday_current_semaine = $this->getFridayCurrentSemaine();
 
         //Récupère la propositionTerminé de id_semaine
         $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
@@ -43,6 +43,11 @@ class CurrentSemaine
             return $id_current_semaine;
         }
         return 0;
+    }
+
+    public function getCurrentSemaine(SemaineRepository $semaineRepository): Semaine
+    {
+        return $semaineRepository->findOneByJour(date_create($this->getFridayCurrentSemaine()));
     }
 }
 
