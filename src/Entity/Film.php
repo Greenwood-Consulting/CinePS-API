@@ -5,40 +5,8 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FilmRepository;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
-
-/**
- * @Hateoas\Relation(
- *      "self",
- *      href = @Hateoas\Route(
- *          "detailFilm",
- *          parameters = { "id" = "expr(object.getId())" }
- *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getFilms")
- * )
- *
- *  * @Hateoas\Relation(
- *      "delete",
- *      href = @Hateoas\Route(
- *          "deleteFilm",
- *          parameters = { "id" = "expr(object.getId())" },
- *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getFilms", excludeIf = "expr(not is_granted('ROLE_ADMIN'))"),
- * )
- *
- * @Hateoas\Relation(
- *      "update",
- *      href = @Hateoas\Route(
- *          "updateFilm",
- *          parameters = { "id" = "expr(object.getId())" },
- *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getFilms", excludeIf = "expr(not is_granted('ROLE_ADMIN'))"),
- * )
- *
- */
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
 class Film
