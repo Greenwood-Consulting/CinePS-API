@@ -22,10 +22,6 @@ class Semaine
     #[Groups(["getPropositions"])]
     private ?\DateTimeInterface $jour = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(["getPropositions"])]
-    private ?string $proposeur = null;
-
     #[ORM\Column]
     #[Groups(["getPropositions"])]
     private ?bool $proposition_termine = null;
@@ -38,9 +34,15 @@ class Semaine
     #[Groups(["getPropositions"])]
     private Collection $propositions;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["getPropositions"])]
+    private ?Membre $proposeur = null;
+
     public function __construct()
     {
         $this->propositions = new ArrayCollection();
+        $this->proposeur = new Membre();
     }
 
     public function getId(): ?int
@@ -56,18 +58,6 @@ class Semaine
     public function setJour(\DateTimeInterface $jour): self
     {
         $this->jour = $jour;
-
-        return $this;
-    }
-
-    public function getProposeur(): ?string
-    {
-        return $this->proposeur;
-    }
-
-    public function setProposeur(string $proposeur): self
-    {
-        $this->proposeur = $proposeur;
 
         return $this;
     }
@@ -122,6 +112,18 @@ class Semaine
                 $proposition->setSemaine(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProposeur(): ?Membre
+    {
+        return $this->proposeur;
+    }
+
+    public function setProposeur(?Membre $proposeur): self
+    {
+        $this->proposeur = $proposeur;
 
         return $this;
     }
