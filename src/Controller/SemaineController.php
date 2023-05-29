@@ -142,13 +142,13 @@ class SemaineController extends AbstractController
         //Récuperer les proposeurs des semaines postérieurs au jour précédent récupéré
 
         $queryBuilder_get_proposeurs = $entityManager->createQueryBuilder();
-        $queryBuilder_get_proposeurs->select('s.proposeur','s.jour')
+        $queryBuilder_get_proposeurs->select('s')
         ->from(Semaine::class, 's')
         ->where('s.jour >= :jour')
         ->setParameter('jour', $resultats_jour[0]['jour']);
 
         $resultats_proposeurs = $queryBuilder_get_proposeurs->getQuery()->getResult();
-        $jsonResultatsProposeurs = $serializer->serialize($resultats_proposeurs, 'json');
+        $jsonResultatsProposeurs = $serializer->serialize($resultats_proposeurs, 'json', ['groups' => 'getPropositions']);
 
         return new JsonResponse ($jsonResultatsProposeurs, Response::HTTP_OK, [], true);
 
