@@ -10,6 +10,7 @@ use App\Repository\MembreRepository;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -197,6 +198,28 @@ class SemaineController extends AbstractController
         $jsonResultatsPropositiuonsAvecVotes = $serializer->serialize($array_propositions_avec_votes, 'json');
         return new JsonResponse ($jsonResultatsPropositiuonsAvecVotes, Response::HTTP_OK, [], true);
 
+    }
+
+    // Met à jour une semaine
+    #[Route('/api/semaine/{id_semaine}', name: 'updateSemaine', methods: ['PATCH'])]
+    public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    {
+        $array_request = json_decode($request->getContent(), true);
+
+        $semaine = $semaineRepository->findOneById($id_semaine);
+
+        if (isset($array_request['proposition_terminee'])){
+            $semaine->setPropositionTermine($array_request['proposition_terminee']);
+        }
+        if (isset($array_request['theme'])){
+            $semaine->setTheme($array_request['theme']);
+        }
+
+        $em->persist($semaine);
+        $em->flush();
+
+        $jsonProposition = $serializer->serialize($semaine, 'json', ['groups' => 'getPropositions']); 
+        return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
 }
