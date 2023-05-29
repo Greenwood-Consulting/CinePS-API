@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Film;
 use App\Entity\Proposition;
+use App\Service\CurrentSemaine;
+use App\Repository\SemaineRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,22 +19,29 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PropositionController extends AbstractController
 {
 
-    //Crée une nouvelle proposition
-    #[Route('/api/proposition', name: 'detailProposition', methods: ['POST'])]
-    public function createProposition(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse
+    // Crée une nouvelle proposition et le film associé
+    #[Route('/api/proposition', name: 'createProposition', methods: ['POST'])]
+    public function createProposition(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
-        $proposition = $serializer->deserialize($request->getContent(), Proposition::class, 'json');
-        echo "<pre> Proposition :"; // DEBUG
-        print_r($proposition);
-        echo "</pre>";
+        $array_request = json_decode($request->getContent(), true);
+
+        $film = new Film();
+        $film->setTitre($array_request['titre_film']);
+        $film->setDate(new DateTime());
+        $film->setSortieFilm($array_request['sortie_film']);
+        $film->setImdb($array_request['imdb_film'] );
+
+        $proposition = new Proposition();
+        $proposition->setSemaine($currentSemaine->getCurrentSemaine($semaineRepository));
+        $proposition->setFilm($film);
+        $proposition->setScore(36);
+
+        $em->persist($film);
         $em->persist($proposition);
         $em->flush();
 
-        $jsonProposition = $serializer->serialize($proposition, 'json', ['groups' => 'getBooks']);
-        
-        $location = $urlGenerator->generate('detailBook', ['id' => $proposition->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonProposition, Response::HTTP_CREATED, ["Location" => $location], true);
+        $jsonProposition = $serializer->serialize($proposition, 'json'); 
+        return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
     }
 
 }
