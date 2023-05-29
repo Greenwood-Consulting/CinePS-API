@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-
 use DateTime;
 use App\Entity\Vote;
 use App\Entity\Semaine;
+use App\Service\CurrentSemaine;
 use App\Repository\MembreRepository;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +31,7 @@ class SemaineController extends AbstractController
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
-    public function getCurrentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
+    public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
         // Date du jour
         $curdate=new DateTime();
@@ -64,25 +64,9 @@ class SemaineController extends AbstractController
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
-    public function getIdCurrentSemaine(SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
+    public function getIdCurrentSemaine(SerializerInterface $serializer, CurrentSemaine $currentSemaine, EntityManagerInterface $entityManager): JsonResponse
     {
-        // Date du jour
-        $curdate=new DateTime();
-
-        // calcul de la date de fin de la période de vote
-        $fin_periode_vote = new DateTime("Fri 14:00");
-        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
-
-        // conversion de la date de fin en timestamp
-        $deadline_vote = strtotime($fin_periode_vote);
-        $deadline_vote = $deadline_vote*1000;
-
-        // Get vendredi id_current_semaine
-        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
-            $friday_current_semaine = $curdate->format('Y-m-d');
-        } else { // Sinon id_current_semaine est défini par vendredi prochain
-            $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
-        }
+        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
 
         //Récupère la propositionTerminé de id_semaine
         $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
@@ -103,30 +87,20 @@ class SemaineController extends AbstractController
         return new JsonResponse ($json_id_current_semaine, Response::HTTP_OK, [], true);
     }
 
+    #[Route('/api/currentSemaine2', name: 'currentSemaine2', methods: ['GET'])]
+    public function currentSemaine2(SerializerInterface $serializer, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository): JsonResponse
+    {
+        $jsonFilmProposes = $serializer->serialize($currentSemaine->getCurrentSemaine($semaineRepository), 'json', ['groups' => 'getPropositions']);
+        return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
+    }
+
     // Retourne l'onjet de la semaine en cours
     #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
-    public function getAnciennesSemaines(SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
+    public function getAnciennesSemaines(CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
     {
-        // TODO Factoriser le calcul du vendredi courant ?
-        // Date du jour
-        $curdate=new DateTime();
+        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
 
-        // calcul de la date de fin de la période de vote
-        $fin_periode_vote = new DateTime("Fri 14:00");
-        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
-
-        // conversion de la date de fin en timestamp
-        $deadline_vote = strtotime($fin_periode_vote);
-        $deadline_vote = $deadline_vote*1000;
-
-        // Get vendredi id_current_semaine
-        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
-            $friday_current_semaine = $curdate->format('Y-m-d');
-        } else { // Sinon id_current_semaine est défini par vendredi prochain
-            $friday_current_semaine = $curdate->modify('next friday')->format('Y-m-d');
-        }
-
-        //Récupère la propositionTerminé de id_semaine
+        //Récupère les semaines plus anciennes que $friday_current_semaine
         $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
         $queryBuilder_get_id_current_semaine->select('s')
         ->from(Semaine::class, 's')
