@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PropositionController extends AbstractController
@@ -40,7 +39,7 @@ class PropositionController extends AbstractController
         $em->persist($proposition);
         $em->flush();
 
-        $jsonProposition = $serializer->serialize($proposition, 'json'); 
+        $jsonProposition = $serializer->serialize($proposition, 'json', ['groups' => 'getPropositions']); 
         return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
     }
 
