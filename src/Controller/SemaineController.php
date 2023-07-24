@@ -31,8 +31,8 @@ class SemaineController extends AbstractController
     }
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
-    #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
-    public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
+    #[Route('/api/currentSemaine/{id_semaine}', name: 'currentSemaine', methods: ['GET'])]
+    public function currentSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
         // Date du jour
         $curdate=new DateTime();
@@ -61,7 +61,19 @@ class SemaineController extends AbstractController
         } else {
             return new JsonResponse(["error" => "Not Found"], 404);
         }
+        //Récupérer les membre ayant voté
+        $queryBuilder_get_membre_votant = $entityManager->createQueryBuilder();
+        $queryBuilder_get_membre_votant->select('a')
+        ->from(AVote::class, 'a')
+        ->where('a.semaine = :semaine')
+        ->setParameter('semaine', $id_semaine);
+
+        $membre_votant = $queryBuilder_get_membre_votant->getQuery()->getResult();
+        $jsonMembreVotant = $serializer->serialize($membre_votant, 'json', ['groups' => 'getPropositions']);
+
+        return new JsonResponse ($jsonMembreVotant, Response::HTTP_OK, [], true);
     }
+    
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
@@ -119,7 +131,7 @@ class SemaineController extends AbstractController
     }
     
 
-    #[Route('/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
+    #[Route('/api/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
     public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
     {
         $filmsProposes = $propositionRepository->findBySemaine($id_semaine);
@@ -128,7 +140,7 @@ class SemaineController extends AbstractController
 
     }
 
-    #[Route('/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
+    #[Route('/api/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
     public function nextProposeurs(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         //Récuperer le jour de la semaine $id_semaine
@@ -156,7 +168,7 @@ class SemaineController extends AbstractController
     }
 
     // Votes de la semaine
-    #[Route('/votes/{id_semaine}', name:'votes', methods: ['GET'])]
+    #[Route('/api/votes/{id_semaine}', name:'votes', methods: ['GET'])]
     public function votes(int $id_semaine, MembreRepository $membreRepository, PropositionRepository $propositionRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         // Récupération des propositions de la semaine
@@ -222,5 +234,32 @@ class SemaineController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
+    // Met à jour une semaine
+    #[Route('/api/nombreProposeur/', name: 'getnombreproposeur', methods: ['GET'])]
+    public function getProposeurs(Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    {
+
+    // Créez un objet QueryBuilder et spécifiez la table et les colonnes que vous souhaitez sélectionner
+    $queryBuilder_get_proposeurs = $em->createQueryBuilder();
+    $queryBuilder_get_proposeurs
+        ->select('s.proposeur', 'COUNT(s.id) AS nb_proposeurs')
+        ->from(Semaine::class, 's')
+        ->groupBy('s.proposeur');
+
+    
+    // Exécutez la requête
+    $nombre_proposeur = $queryBuilder_get_proposeurs->getQuery()->getResult();
+
+
+    $jsonProposition = $serializer->serialize($nombre_proposeur, 'json', ['groups' => 'getPropositions']); 
+    return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
+
+    // Les résultats seront un tableau d'objets ou d'arrays contenant les colonnes sélectionnées
+    // foreach ($results as $result) {
+    //     $proposeur = $result['proposeur'];
+    //     $nbProposeurs = $result['nb_proposeurs'];
+
+    // }
+    }
 }
 ?>

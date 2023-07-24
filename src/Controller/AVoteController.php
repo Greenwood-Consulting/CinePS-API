@@ -13,25 +13,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AVoteController extends AbstractController
 {
-    //Afficher les membres ayant voté pour la semaine
-    #[Route('/membreVotant/{id_semaine}', name:'membreVotant', methods: ['GET'])]
-    public function membreVotant(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
-    {
-        //Récupérer les membre ayant voté
-        $queryBuilder_get_membre_votant = $entityManager->createQueryBuilder();
-        $queryBuilder_get_membre_votant->select('a')
-        ->from(AVote::class, 'a')
-        ->where('a.semaine = :semaine')
-        ->setParameter('semaine', $id_semaine);
-
-        $membre_votant = $queryBuilder_get_membre_votant->getQuery()->getResult();
-        $jsonMembreVotant = $serializer->serialize($membre_votant, 'json', ['groups' => 'getPropositions']);
-
-        return new JsonResponse ($jsonMembreVotant, Response::HTTP_OK, [], true);
-    }
+   
     
     // Indique si l'utilisateur a voté pour alse amine en cours
-    #[Route('/aVoteCurrentSemaine/{id_membre}', name:'AVoteCurrentSemaine', methods: ['GET'])]
+    #[Route('/api/aVoteCurrentSemaine/{id_membre}', name:'AVoteCurrentSemaine', methods: ['GET'])]
     public function aVoteCurrentSemaine(CurrentSemaine $currentSemaine, int $id_membre, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $id_current_semaine = $currentSemaine->getIdCurrentSemaine($entityManager);
