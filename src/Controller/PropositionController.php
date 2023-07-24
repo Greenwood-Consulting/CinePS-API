@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Film;
+use App\Entity\Semaine;
 use App\Entity\Proposition;
 use App\Service\CurrentSemaine;
 use App\Repository\SemaineRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\PropositionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,5 +44,26 @@ class PropositionController extends AbstractController
         $jsonProposition = $serializer->serialize($proposition, 'json', ['groups' => 'getPropositions']); 
         return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
     }
+
+    #[Route('/api/Allproposition', name: 'app_Allproposition')]
+    public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
+    {
+
+        $propositionList = $propositionRepository->findAll();
+
+        $jsonPropositionList = $serializer->serialize($propositionList, 'json');
+        return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
+    }
+
+    // #[Route('/api/Allproposition', name: 'app_Allproposition')]
+    // public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer, EntityManagerInterface $em)
+    // {
+
+    
+    //     $queryBuilder_get_propositions = $em->createQueryBuilder();
+    //     $queryBuilder_get_propositions->select('p')
+    //     ->from(Proposition::class, 'p')
+
+    // }
 
 }

@@ -20,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class VoteController extends AbstractController
 {
     // Retourner le film victorieux de la semaine id_semaine
-    #[Route('/filmVictorieux/{id_semaine}', name:'FilmVictorieux', methods: ['GET'])]
+    #[Route('/api/filmVictorieux/{id_semaine}', name:'FilmVictorieux', methods: ['GET'])]
     public function filmVictorieux(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         //Récupérer le film de la semaine qui a le score le plus élevé

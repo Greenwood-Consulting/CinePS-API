@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Film;
+use App\Repository\FilmRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -43,6 +45,19 @@ class FilmController extends AbstractController
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
+
+
+    #[Route('/api/Allfilms', name: 'app_Allfilms')]
+    public function getAllFilms(FilmRepository $filmRepository, SerializerInterface $serializer): JsonResponse
+    {
+
+        $filmList = $filmRepository->findAll();
+
+        $jsonFilmList = $serializer->serialize($filmList, 'json');
+        return new JsonResponse($jsonFilmList, Response::HTTP_OK, [], true);
+    }
+
+    
 }
 
 ?>

@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class GetProposeurController extends AbstractController
 {
     //Récupère le proposeur de la semaine $id_semaine
-    #[Route('/getProposeur/{id_semaine}', name: 'app_get_proposeur')]
+    #[Route('/api/getProposeur/{id_semaine}', name: 'app_get_proposeur')]
     public function getProposeurSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         //Récupère la propositionTerminé de id_semaine
@@ -34,7 +34,7 @@ class GetProposeurController extends AbstractController
 
 
     //Work In Progress
-    #[Route('/getCurrentProposeur/{id_semaine}', name: 'app_get_current_proposeur')]
+    #[Route('/api/getCurrentProposeur/{id_semaine}', name: 'app_get_current_proposeur')]
     public function getCurrentProposeur(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         //Récupère la propositionTerminé de id_semaine
