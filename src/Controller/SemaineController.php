@@ -31,8 +31,8 @@ class SemaineController extends AbstractController
     }
 
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
-    #[Route('/api/currentSemaine/{id_semaine}', name: 'currentSemaine', methods: ['GET'])]
-    public function currentSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
+    #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
+    public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
         // Date du jour
         $curdate=new DateTime();
@@ -61,17 +61,7 @@ class SemaineController extends AbstractController
         } else {
             return new JsonResponse(["error" => "Not Found"], 404);
         }
-        //Récupérer les membre ayant voté
-        $queryBuilder_get_membre_votant = $entityManager->createQueryBuilder();
-        $queryBuilder_get_membre_votant->select('a')
-        ->from(AVote::class, 'a')
-        ->where('a.semaine = :semaine')
-        ->setParameter('semaine', $id_semaine);
-
-        $membre_votant = $queryBuilder_get_membre_votant->getQuery()->getResult();
-        $jsonMembreVotant = $serializer->serialize($membre_votant, 'json', ['groups' => 'getPropositions']);
-
-        return new JsonResponse ($jsonMembreVotant, Response::HTTP_OK, [], true);
+        
     }
     
 
