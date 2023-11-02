@@ -51,7 +51,7 @@ class FilmController extends AbstractController
     public function getAllFilms(EntityManagerInterface $entityManager, FilmRepository $filmRepository, SerializerInterface $serializer): JsonResponse
     {
 
-        //Récupérer le film de la semaine qui a le score le plus élevé
+        //Récupére tous les films en les classant par ordre anthéchronologique
         $queryBuilder_get_film = $entityManager->createQueryBuilder();
         $queryBuilder_get_film->select('f')
         ->from(Film::class, 'f')
