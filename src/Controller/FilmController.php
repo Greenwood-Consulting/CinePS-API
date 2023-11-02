@@ -48,13 +48,19 @@ class FilmController extends AbstractController
 
 
     #[Route('/api/Allfilms', name: 'app_Allfilms')]
-    public function getAllFilms(FilmRepository $filmRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllFilms(EntityManagerInterface $entityManager, FilmRepository $filmRepository, SerializerInterface $serializer): JsonResponse
     {
 
-        $filmList = $filmRepository->findAll();
+        //Récupérer le film de la semaine qui a le score le plus élevé
+        $queryBuilder_get_film = $entityManager->createQueryBuilder();
+        $queryBuilder_get_film->select('f')
+        ->from(Film::class, 'f')
+        ->orderBy('f.sortie_film', 'DESC');
 
-        $jsonFilmList = $serializer->serialize($filmList, 'json');
-        return new JsonResponse($jsonFilmList, Response::HTTP_OK, [], true);
+        $get_film = $queryBuilder_get_film->getQuery()->getResult();
+        $jsonFilm = $serializer->serialize($get_film, 'json');
+
+        return new JsonResponse ($jsonFilm, Response::HTTP_OK, [], true);
     }
 
     
