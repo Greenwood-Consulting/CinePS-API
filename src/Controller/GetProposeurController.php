@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Semaine;
 use App\Repository\MembreRepository;
+use App\Repository\SemaineRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,47 +15,41 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class GetProposeurController extends AbstractController
 {
     //Récupère le proposeur de la semaine $id_semaine
-    #[Route('/api/getProposeur/{id_semaine}', name: 'app_get_proposeur')]
-    public function getProposeurSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    #[Route('/api/getProposeur/{id_semaine}', name: 'app_get_proposeur', methods: ['GET'])]
+    public function getProposeur(int $id_semaine, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
-        //Récupère la propositionTerminé de id_semaine
-        $queryBuilder_get_jour = $entityManager->createQueryBuilder();
-        $queryBuilder_get_jour->select('s.proposeur')
-        ->from(Semaine::class, 's')
-        ->where('s.id = :id')
-        ->setParameter('id', $id_semaine);
+        $semaine = $semaineRepository->find($id_semaine);
+        $proposeur = $semaine->getProposeur();
 
-        $resultat_proposeur_semaine = $queryBuilder_get_jour->getQuery()->getResult();
-        $jsonResultatsProposeurSemaine = $serializer->serialize($resultat_proposeur_semaine, 'json');
+        $jsonProposeur = $serializer->serialize($proposeur, 'json');
 
-        if(isset($resultat_proposeur_semaine)){
-            return new JsonResponse ($jsonResultatsProposeurSemaine, Response::HTTP_OK, [], true);
-        }
+        return new JsonResponse($jsonProposeur, Response::HTTP_OK, [], true);
+
     }
 
 
 
     //Work In Progress
-    #[Route('/api/getCurrentProposeur/{id_semaine}', name: 'app_get_current_proposeur')]
-    public function getCurrentProposeur(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
-    {
-        //Récupère la propositionTerminé de id_semaine
-        $queryBuilder_get_jour = $entityManager->createQueryBuilder();
-        $queryBuilder_get_jour->select('s.proposeur')
-        ->from(Semaine::class, 's')
-        ->where('s.id = :id')
-        ->setParameter('id', $id_semaine);
+    // #[Route('/api/getCurrentProposeur/{id_semaine}', name: 'app_get_current_proposeur', methods: ['GET'])]
+    // public function getCurrentProposeur(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    // {
+    //     //Récupère la propositionTerminé de id_semaine
+    //     $queryBuilder_get_jour = $entityManager->createQueryBuilder();
+    //     $queryBuilder_get_jour->select('s.proposeur')
+    //     ->from(Semaine::class, 's')
+    //     ->where('s.id = :id')
+    //     ->setParameter('id', $id_semaine);
 
-        $resultat_proposeur_semaine = $queryBuilder_get_jour->getQuery()->getResult();
-        $jsonResultatsProposeurSemaine = $serializer->serialize($resultat_proposeur_semaine, 'json');
+    //     $resultat_proposeur_semaine = $queryBuilder_get_jour->getQuery()->getResult();
+    //     $jsonResultatsProposeurSemaine = $serializer->serialize($resultat_proposeur_semaine, 'json');
 
-        if(isset($resultat_proposeur_semaine)){
-            return new JsonResponse ($jsonResultatsProposeurSemaine, Response::HTTP_OK, [], true);
-        }
-    }
+    //     if(isset($resultat_proposeur_semaine)){
+    //         return new JsonResponse ($jsonResultatsProposeurSemaine, Response::HTTP_OK, [], true);
+    //     }
+    // }
 
     //Récupère le nombre de proposeur 
-    #[Route('/api/getNbPropositionsParProposeur', name: 'app_get_proposeur')]
+    #[Route('/api/getNbPropositionsParProposeur', name: 'app_get_nbproposeur')]
     public function getCountProposeurSemaine(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $queryBuilder_get_nb_propositions_par_proposeur = $entityManager->createQueryBuilder();
@@ -71,4 +66,5 @@ class GetProposeurController extends AbstractController
 
         
     }
+
 }
