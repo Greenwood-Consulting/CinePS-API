@@ -14,30 +14,18 @@ class AVote
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Semaine $semaine = null;
-
     #[ORM\ManyToOne(inversedBy: 'no')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getPropositions"])]
     private ?Membre $votant = null;
 
+    #[ORM\ManyToOne(inversedBy: 'votants')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Semaine $semaine = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSemaine(): ?Semaine
-    {
-        return $this->semaine;
-    }
-
-    public function setSemaine(Semaine $semaine): self
-    {
-        $this->semaine = $semaine;
-
-        return $this;
     }
 
     public function getVotant(): ?Membre
@@ -48,6 +36,18 @@ class AVote
     public function setVotant(?Membre $votant): self
     {
         $this->votant = $votant;
+
+        return $this;
+    }
+
+    public function getSemaine(): ?Semaine
+    {
+        return $this->semaine;
+    }
+
+    public function setSemaine(?Semaine $semaine): self
+    {
+        $this->semaine = $semaine;
 
         return $this;
     }

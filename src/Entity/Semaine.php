@@ -39,10 +39,15 @@ class Semaine
     #[Groups(["getPropositions"])]
     private ?Membre $proposeur = null;
 
+    #[ORM\OneToMany(mappedBy: 'semaine', targetEntity: AVote::class, orphanRemoval: true)]
+    #[Groups(["getPropositions"])]
+    private Collection $votants;
+
     public function __construct()
     {
         $this->propositions = new ArrayCollection();
         $this->proposeur = new Membre();
+        $this->votants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,6 +129,36 @@ class Semaine
     public function setProposeur(?Membre $proposeur): self
     {
         $this->proposeur = $proposeur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AVote>
+     */
+    public function getVotants(): Collection
+    {
+        return $this->votants;
+    }
+
+    public function addVotant(AVote $votant): self
+    {
+        if (!$this->votants->contains($votant)) {
+            $this->votants->add($votant);
+            $votant->setSemaine($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVotant(AVote $votant): self
+    {
+        if ($this->votants->removeElement($votant)) {
+            // set the owning side to null (unless already changed)
+            if ($votant->getSemaine() === $this) {
+                $votant->setSemaine(null);
+            }
+        }
 
         return $this;
     }
