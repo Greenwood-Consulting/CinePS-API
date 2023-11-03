@@ -163,7 +163,7 @@ class SemaineController extends AbstractController
     {
         // Récupération des propositions de la semaine
         $propositions = $propositionRepository->findBySemaine($id_semaine);
-        $jsonPropositions = $serializer->serialize($propositions, 'json');
+        $jsonPropositions = $serializer->serialize($propositions, 'json', ['groups' => 'getPropositions']);
         $arrayPropositions = json_decode($jsonPropositions, true);
 
         $array_propositions_avec_votes = array();
@@ -184,7 +184,7 @@ class SemaineController extends AbstractController
                 ->setParameters(array('id_proposition' => $proposition['id'], 'id_membre' => $membre['id']));
         
                 $resultat_vote = $queryBuilder_get_vote->getQuery()->getResult();
-                $jsonResultatVote = $serializer->serialize($resultat_vote, 'json');
+                $jsonResultatVote = $serializer->serialize($resultat_vote, 'json', ['groups' => 'getPropositions']);
                 $arrayVote = json_decode($jsonResultatVote, true);
 
                 if (empty($arrayVote)){
@@ -197,7 +197,7 @@ class SemaineController extends AbstractController
             $array_propositions_avec_votes[] = $proposition;
         } // fin du parcours des propositions
 
-        $jsonResultatsPropositiuonsAvecVotes = $serializer->serialize($array_propositions_avec_votes, 'json');
+        $jsonResultatsPropositiuonsAvecVotes = $serializer->serialize($array_propositions_avec_votes, 'json', ['groups' => 'getPropositions']);
         return new JsonResponse ($jsonResultatsPropositiuonsAvecVotes, Response::HTTP_OK, [], true);
 
     }
