@@ -23,7 +23,7 @@ class VoteController extends AbstractController
     #[Route('/api/filmVictorieux/{id_semaine}', name:'FilmVictorieux', methods: ['GET'])]
     public function filmVictorieux(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
-        //Récupérer le film de la semaine qui a le score le plus élevé
+        // Récupérer le film de la semaine qui a le score le plus élevé
         $queryBuilder_get_film_victorieux = $entityManager->createQueryBuilder();
         $queryBuilder_get_film_victorieux->select('p')
         ->from(Proposition::class, 'p')
@@ -33,9 +33,27 @@ class VoteController extends AbstractController
         ->setParameter('semaine', $id_semaine);
 
         $film_victorieux = $queryBuilder_get_film_victorieux->getQuery()->getResult();
-        $jsonFilmVictorieux = $serializer->serialize($film_victorieux, 'json');
 
-        return new JsonResponse ($jsonFilmVictorieux, Response::HTTP_OK, [], true);
+
+        // Récupérer tous les films avec le même score dans la même semaine
+        $queryBuilder_films_egalite = $entityManager->createQueryBuilder();
+        $queryBuilder_films_egalite->select('p')
+            ->from(Proposition::class, 'p')
+            ->where('p.score = :score')
+            ->andWhere('p.semaine = :semaine')
+            ->setParameter('score', $film_victorieux[0]->getScore())
+            ->setParameter('semaine', $id_semaine);
+
+        $filmsAvecMemeScore = $queryBuilder_films_egalite->getQuery()->getResult();
+
+        if (count($filmsAvecMemeScore) > 1) {
+            $jsonfilmsAvecMemeScore = $serializer->serialize($filmsAvecMemeScore, 'json');
+            return new JsonResponse($jsonfilmsAvecMemeScore, Response::HTTP_OK, [], true);
+        }else {
+            $jsonFilmVictorieux = $serializer->serialize($film_victorieux, 'json');
+            return new JsonResponse($jsonFilmVictorieux, Response::HTTP_OK, [], true);
+        
+        }
     }
 
     // Enregistre une nouvelle ligne dans la table 'AVote'
