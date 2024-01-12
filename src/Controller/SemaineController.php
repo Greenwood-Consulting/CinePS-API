@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use DateTime;
+use App\Entity\Note;
 use App\Entity\Vote;
 use App\Entity\Semaine;
 use App\Service\CurrentSemaine;
@@ -166,7 +167,7 @@ class SemaineController extends AbstractController
         $jsonPropositions = $serializer->serialize($propositions, 'json', ['groups' => 'getPropositions']);
         $arrayPropositions = json_decode($jsonPropositions, true);
 
-        $array_propositions_avec_votes = array();
+        $array_propositions_avec_votes_et_notes = array();
         foreach($arrayPropositions as $proposition){
 
             $membres = $membreRepository->findAll();
@@ -174,6 +175,8 @@ class SemaineController extends AbstractController
             $arrayMembres = json_decode($jsonMembres, true);
 
             $proposition_votes = array(); // tableau dans lequel on stocke les votes de cette proposition
+            
+            $proposition_notes = array(); // tableau dans lequel on stocke les notes de cette proposition
             foreach($arrayMembres as $membre){
                 // Résupérer le vote de l'utilisateur pour cette proposition
                 $queryBuilder_get_vote = $entityManager->createQueryBuilder();
@@ -192,13 +195,32 @@ class SemaineController extends AbstractController
                 } else {
                     $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => $arrayVote[0]['vote']);
                 }
+
+                // Récupérer la note de l'utilisateur pour cette proposition
+                $queryBuilder_get_note = $entityManager->createQueryBuilder();
+                $queryBuilder_get_note->select('n.note')
+                ->from(Note::class, 'n')
+                ->where('n.proposition = :id_proposition')
+                ->andWhere('n.membre = :id_membre')
+                ->setParameters(array('id_proposition' => $proposition['id'], 'id_membre' => $membre['id']));
+        
+                $resultat_note = $queryBuilder_get_note->getQuery()->getResult();
+                $jsonResultatNote = $serializer->serialize($resultat_note, 'json', ['groups' => 'getPropositions']);
+                $arrayNote = json_decode($jsonResultatNote, true);
+
+                if (empty($arrayNote)){
+                    $proposition_notes[] = array("membre" => $membre['id'], "note" => '');;
+                } else {
+                    $proposition_notes[] = array("membre" => $membre['id'], "note" => $arrayNote[0]['note']);
+                }
             }
             $proposition['vote'] = $proposition_votes;
-            $array_propositions_avec_votes[] = $proposition;
+            $proposition['note'] = $proposition_notes;
+            $array_propositions_avec_votes_et_notes[] = $proposition;
         } // fin du parcours des propositions
 
-        $jsonResultatsPropositiuonsAvecVotes = $serializer->serialize($array_propositions_avec_votes, 'json', ['groups' => 'getPropositions']);
-        return new JsonResponse ($jsonResultatsPropositiuonsAvecVotes, Response::HTTP_OK, [], true);
+        $jsonResultatsPropositiuonsAvecVotesEtNotes = $serializer->serialize($array_propositions_avec_votes_et_notes, 'json', ['groups' => 'getPropositions']);
+        return new JsonResponse ($jsonResultatsPropositiuonsAvecVotesEtNotes, Response::HTTP_OK, [], true);
 
     }
 
