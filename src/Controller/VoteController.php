@@ -95,4 +95,47 @@ class VoteController extends AbstractController
         $jsonVote = $serializer->serialize($vote, 'json'); 
         return new JsonResponse($jsonVote, Response::HTTP_CREATED, [], true);
     }
+
+    // Enregistre le vote et met à jour le score de la proposition
+    #[Route('/api/saveVotePropositionMigration', name:"saveVotePropositionMigration", methods: ['POST'])]
+    public function saveVotePropositionMigration(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
+    {
+        $array_request = json_decode($request->getContent(), true);
+        $membre = $membreRepository->findOneById($array_request['membre']);
+        $proposition = $propositionRepository->findOneById($array_request['proposition']);
+        $proposition->setScore($proposition->getScore() - $array_request['vote']);
+        $semaine = $semaineRepository->find($array_request['id_semaine']);
+
+        $vote = new Vote();
+        $vote->setSemaine($semaine);
+        $vote->setMembre($membre);
+        $vote->setProposition($proposition);
+        $vote->setVote($array_request['vote']);
+
+        $em->persist($vote);
+        $em->flush();
+
+        $jsonVote = $serializer->serialize($vote, 'json'); 
+        return new JsonResponse($jsonVote, Response::HTTP_CREATED, [], true);
+    }
+
+    // Enregistre une nouvelle ligne dans la table 'AVote'
+    #[Route('/api/avoteMigration', name:"aVoteMigration", methods: ['POST'])]
+    public function avoteMigration(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
+    {
+
+        $array_request = json_decode($request->getContent(), true);
+        $votant = $membreRepository->findOneById($array_request['membre']);
+        $semaine = $semaineRepository->find($array_request['id_semaine']);
+
+        $avote = new AVote();
+        $avote->setVotant($votant);
+        $avote->setSemaine($semaine);
+
+        $em->persist($avote);
+        $em->flush();
+
+        $jsonAVote = $serializer->serialize($avote, 'json');
+        return new JsonResponse($jsonAVote, Response::HTTP_CREATED, [], true);
+   }
 }

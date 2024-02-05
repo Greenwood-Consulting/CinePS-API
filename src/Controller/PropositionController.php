@@ -10,6 +10,7 @@ use App\Service\CurrentSemaine;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -55,15 +56,28 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
     }
 
-    // #[Route('/api/Allproposition', name: 'app_Allproposition')]
-    // public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer, EntityManagerInterface $em)
-    // {
+   // Crée une nouvelle proposition et le film associé
+   #[Route('/api/propositionMigration', name: 'createPropositionMigration', methods: ['POST'])]
+   public function migrationProposition(Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+   {
+       $array_request = json_decode($request->getContent(), true);
+       $semaine = $semaineRepository->find($array_request['id_semaine']);
+       $film = new Film();
+       $film->setTitre($array_request['titre_film']);
+       $film->setDate(new DateTime());
+       $film->setSortieFilm($array_request['sortie_film']);
+       $film->setImdb($array_request['imdb_film'] );
 
-    
-    //     $queryBuilder_get_propositions = $em->createQueryBuilder();
-    //     $queryBuilder_get_propositions->select('p')
-    //     ->from(Proposition::class, 'p')
+       $proposition = new Proposition();
+       $proposition->setSemaine($semaine);
+       $proposition->setFilm($film);
+       $proposition->setScore(36);
 
-    // }
+       $em->persist($film);
+       $em->persist($proposition);
+       $em->flush();
 
+       $jsonProposition = $serializer->serialize($proposition, 'json', ['groups' => 'getPropositions']); 
+       return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
+   }
 }
