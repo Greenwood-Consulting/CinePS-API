@@ -132,7 +132,7 @@ class AppFixtures extends Fixture
             //Création d'une Semaine 2
             $semaine2 = new Semaine();
             $semaine2->setJour(new \DateTime('2023-02-30'));
-            $semaine2->setProposeur("Jessy");
+            $semaine2->setProposeur($membre_jessy);
             $semaine2->setPropositionTermine(true);
             $semaine2->setTheme("DC");
             $manager->persist($semaine2);
@@ -140,7 +140,7 @@ class AppFixtures extends Fixture
             //Création d'une Semaine 3
             $semaine3 = new Semaine();
             $semaine3->setJour(new \DateTime('2023-05-12'));
-            $semaine3->setProposeur("Robin");
+            $semaine3->setProposeur($membre_robin);
             $semaine3->setPropositionTermine(false);
             $semaine3->setTheme("NoTheme");
             $manager->persist($semaine3);
@@ -148,7 +148,7 @@ class AppFixtures extends Fixture
             //Création d'une semaine 4
             $semaine4 = new Semaine();
             $semaine4->setJour(new \DateTime('2023-05-19'));
-            $semaine4->setProposeur("Coco");
+            $semaine4->setProposeur($membre_coco);
             $semaine4->setPropositionTermine(false);
             $semaine4->setTheme("Marvel");
             $manager->persist($semaine4);
