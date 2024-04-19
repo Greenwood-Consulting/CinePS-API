@@ -8,6 +8,7 @@ use App\Repository\SemaineRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\Config\TypeSemaine;
 
 #[ORM\Entity(repositoryClass: SemaineRepository::class)]
 class Semaine
@@ -42,6 +43,10 @@ class Semaine
     #[ORM\OneToMany(mappedBy: 'semaine', targetEntity: AVote::class, orphanRemoval: true)]
     #[Groups(["getPropositions"])]
     private Collection $votants;
+
+    #[Groups(["getPropositions"])]
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
 
     public function __construct()
     {
@@ -159,6 +164,18 @@ class Semaine
                 $votant->setSemaine(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
