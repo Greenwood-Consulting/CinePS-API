@@ -6,15 +6,16 @@ use App\Entity\Vote;
 use App\Entity\AVote;
 use App\Entity\Proposition;
 use App\Service\CurrentSemaine;
+use App\Service\FilmVictorieux;
 use App\Repository\MembreRepository;
 use App\Repository\SemaineRepository;
-use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\PropositionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class VoteController extends AbstractController
@@ -22,39 +23,11 @@ class VoteController extends AbstractController
     // Retourner le  ou les film victorieux de la semaine id_semaine 
     //Il y a un tableau car il peut y avoir plusieurs films à égalité
     #[Route('/api/filmVictorieux/{id_semaine}', name:'FilmVictorieux', methods: ['GET'])]
-    public function filmVictorieux(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function filmVictorieux(int $id_semaine, FilmVictorieux $filmVictorieux, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
-        // Récupérer le film de la semaine qui a le score le plus élevé
-        $queryBuilder_get_film_victorieux = $entityManager->createQueryBuilder();
-        $queryBuilder_get_film_victorieux->select('p')
-        ->from(Proposition::class, 'p')
-        ->orderBy('p.score', 'DESC')
-        ->setMaxResults(1)
-        ->where('p.semaine = :semaine')
-        ->setParameter('semaine', $id_semaine);
-
-        $film_victorieux = $queryBuilder_get_film_victorieux->getQuery()->getResult();
-
-
-        // Récupérer tous les films avec le même score dans la même semaine
-        $queryBuilder_films_egalite = $entityManager->createQueryBuilder();
-        $queryBuilder_films_egalite->select('p')
-            ->from(Proposition::class, 'p')
-            ->where('p.score = :score')
-            ->andWhere('p.semaine = :semaine')
-            ->setParameter('score', $film_victorieux[0]->getScore())
-            ->setParameter('semaine', $id_semaine);
-
-        $filmsAvecMemeScore = $queryBuilder_films_egalite->getQuery()->getResult();
-
-        if (count($filmsAvecMemeScore) > 1) {
-            $jsonfilmsAvecMemeScore = $serializer->serialize($filmsAvecMemeScore, 'json');
-            return new JsonResponse($jsonfilmsAvecMemeScore, Response::HTTP_OK, [], true);
-        }else {
-            $jsonFilmVictorieux = $serializer->serialize($film_victorieux, 'json');
-            return new JsonResponse($jsonFilmVictorieux, Response::HTTP_OK, [], true);
-        
-        }
+        $film_victorieux = $filmVictorieux->getFilmVictorieux($id_semaine, $semaineRepository, $entityManager, $serializer);
+        $jsonFilmVictorieux = $serializer->serialize($film_victorieux, 'json', ['groups' => 'getPropositions']);
+        return new JsonResponse($jsonFilmVictorieux, Response::HTTP_OK, [], true);
     }
 
     // Enregistre une nouvelle ligne dans la table 'AVote'
