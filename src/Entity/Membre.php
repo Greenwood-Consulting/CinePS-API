@@ -21,6 +21,7 @@ class Membre
     #[Groups(["getPropositions"])]
     private ?string $Nom = null;
 
+    #[Groups(["getPropositions"])]
     #[ORM\Column(length: 255)]
     private ?string $Prenom = null;
 
