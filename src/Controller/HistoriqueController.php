@@ -57,10 +57,9 @@ class HistoriqueController extends AbstractController
                 $arrayMembres = json_decode($jsonMembres, true);
 
                 $proposition_votes = array(); // tableau dans lequel on stocke les votes de cette proposition
-                
                 $proposition_notes = array(); // tableau dans lequel on stocke les notes de cette proposition
                 foreach($arrayMembres as $membre){
-                    // Résupérer le vote de l'utilisateur pour cette proposition
+                    // Récupérer le vote de l'utilisateur pour cette proposition
                     $queryBuilder_get_vote = $entityManager->createQueryBuilder();
                     $queryBuilder_get_vote->select('v.vote')
                     ->from(Vote::class, 'v')
@@ -73,7 +72,7 @@ class HistoriqueController extends AbstractController
                     $arrayVote = json_decode($jsonResultatVote, true);
 
                     if (empty($arrayVote)){
-                        $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => '');;
+                        $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => '');
                     } else {
                         $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => $arrayVote[0]['vote']);
                     }
@@ -91,7 +90,7 @@ class HistoriqueController extends AbstractController
                     $arrayNote = json_decode($jsonResultatNote, true);
 
                     if (empty($arrayNote)){
-                        $proposition_notes[] = array("membre" => $membre['id'], "note" => '');;
+                        $proposition_notes[] = array("membre" => $membre['id'], "note" => '');
                     } else {
                         $proposition_notes[] = array("membre" => $membre['id'], "note" => $arrayNote[0]['note']);
                     }

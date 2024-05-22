@@ -24,6 +24,10 @@ class FilmVictorieux
         $jsonFilmVictorieux = $serializer->serialize($film_victorieux, 'json', ['groups' => 'getPropositions']);
         $arrayFilmVictorieux = json_decode($jsonFilmVictorieux, true);
 
+        if (count($arrayFilmVictorieux) === 0){
+            return array();
+        }
+
         // Récupérer tous les films avec le même score dans la même semaine
         $queryBuilder_films_egalite = $entityManager->createQueryBuilder();
         $queryBuilder_films_egalite->select('p')
@@ -37,6 +41,7 @@ class FilmVictorieux
 
         $jsonfilmsAvecMemeScore = $serializer->serialize($filmsAvecMemeScore, 'json', ['groups' => 'getPropositions']);
         $arrayFilmsAvecMemeScore =  json_decode($jsonfilmsAvecMemeScore, true);
+
         $film_victorieux = $arrayFilmsAvecMemeScore[0];
 
         $proposition_film_victorieux = json_encode($film_victorieux, true);
