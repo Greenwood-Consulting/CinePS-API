@@ -55,29 +55,5 @@ class PropositionController extends AbstractController
         $jsonPropositionList = $serializer->serialize($propositionList, 'json');
         return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
     }
-
-   // Crée une nouvelle proposition et le film associé
-   #[Route('/api/propositionMigration', name: 'createPropositionMigration', methods: ['POST'])]
-   public function migrationProposition(Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
-   {
-       $array_request = json_decode($request->getContent(), true);
-       $semaine = $semaineRepository->find($array_request['id_semaine']);
-       $film = new Film();
-       $film->setTitre($array_request['titre_film']);
-       $film->setDate(new DateTime());
-       $film->setSortieFilm($array_request['sortie_film']);
-       $film->setImdb($array_request['imdb_film'] );
-
-       $proposition = new Proposition();
-       $proposition->setSemaine($semaine);
-       $proposition->setFilm($film);
-       $proposition->setScore(36);
-
-       $em->persist($film);
-       $em->persist($proposition);
-       $em->flush();
-
-       $jsonProposition = $serializer->serialize($proposition, 'json', ['groups' => 'getPropositions']); 
-       return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
-   }
+    
 }

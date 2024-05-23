@@ -33,19 +33,5 @@ class MembreController extends AbstractController
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
-
-    #[Route('/api/membre/{prenom}', name: 'prenomMembre', methods: ['GET'])]
-    public function getPrenomMembre(string $prenom, SerializerInterface $serializer, MembreRepository $membreRepository): JsonResponse
-    {
-        $membre = $membreRepository->findOneBy(['Prenom' => $prenom]);
-
-        if ($membre) {
-            $jsonMembre = $serializer->serialize($membre, 'json');
-            return new JsonResponse($jsonMembre, Response::HTTP_OK, [], true);
-        }
-
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-    }
-
     
 }
