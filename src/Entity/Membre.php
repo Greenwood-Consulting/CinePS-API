@@ -30,6 +30,9 @@ class Membre
     #[ORM\Column(length: 255)]
     private ?string $mdp = null;
 
+    #[ORM\Column]
+    private ?bool $actif = null;
+
     #[ORM\ManyToOne(inversedBy: 'Membre')]
     #[ORM\JoinColumn(nullable: false)]
 
@@ -82,6 +85,18 @@ class Membre
     public function setMdp(string $mdp): self
     {
         $this->mdp = $mdp;
+
+        return $this;
+    }
+
+    public function isActif(): ?bool
+    {
+        return $this->actif;
+    }
+
+    public function setActif(bool $actif): static
+    {
+        $this->actif = $actif;
 
         return $this;
     }
