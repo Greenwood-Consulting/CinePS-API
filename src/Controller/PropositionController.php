@@ -45,25 +45,4 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
     }
 
-    #[Route('/api/Allproposition', name: 'app_Allproposition')]
-    public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
-    {
-
-        $propositionList = $propositionRepository->findAll();
-
-        $jsonPropositionList = $serializer->serialize($propositionList, 'json');
-        return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
-    }
-
-    // #[Route('/api/Allproposition', name: 'app_Allproposition')]
-    // public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer, EntityManagerInterface $em)
-    // {
-
-    
-    //     $queryBuilder_get_propositions = $em->createQueryBuilder();
-    //     $queryBuilder_get_propositions->select('p')
-    //     ->from(Proposition::class, 'p')
-
-    // }
-
 }
