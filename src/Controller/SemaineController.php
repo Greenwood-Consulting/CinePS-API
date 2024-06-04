@@ -121,16 +121,6 @@ class SemaineController extends AbstractController
         return new JsonResponse(["error" => "Not Found"], 404);
     }
     
-
-    #[Route('/api/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
-    public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
-    {
-        $filmsProposes = $propositionRepository->findBySemaine($id_semaine);
-        $jsonFilmProposes = $serializer->serialize($filmsProposes, 'json', ['groups' => 'getPropositions']);
-        return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
-
-    }
-
     #[Route('/api/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
     public function nextProposeurs(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
