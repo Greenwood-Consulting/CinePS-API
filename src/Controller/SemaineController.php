@@ -246,32 +246,5 @@ class SemaineController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
-    // Met à jour une semaine
-    #[Route('/api/nombreProposeur/', name: 'getnombreproposeur', methods: ['GET'])]
-    public function getProposeurs(Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
-    {
-
-    // Créez un objet QueryBuilder et spécifiez la table et les colonnes que vous souhaitez sélectionner
-    $queryBuilder_get_proposeurs = $em->createQueryBuilder();
-    $queryBuilder_get_proposeurs
-        ->select('s.proposeur', 'COUNT(s.id) AS nb_proposeurs')
-        ->from(Semaine::class, 's')
-        ->groupBy('s.proposeur');
-
-    
-    // Exécutez la requête
-    $nombre_proposeur = $queryBuilder_get_proposeurs->getQuery()->getResult();
-
-
-    $jsonProposition = $serializer->serialize($nombre_proposeur, 'json', ['groups' => 'getPropositions']); 
-    return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-
-    // Les résultats seront un tableau d'objets ou d'arrays contenant les colonnes sélectionnées
-    // foreach ($results as $result) {
-    //     $proposeur = $result['proposeur'];
-    //     $nbProposeurs = $result['nb_proposeurs'];
-
-    // }
-    }
 }
 ?>
