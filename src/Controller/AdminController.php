@@ -44,7 +44,7 @@ class AdminController extends AbstractController
         $array_request = json_decode($request->getContent(), true);
         $membre = $membreRepository->findOneById($array_request['proposeur_id']);
         $jour = DateTime::createFromFormat('Y-m-d', $array_request['jour']);
-        $typeSemaine = $array_request['type'];
+        $typeSemaine = $array_request['type_semaine'];
 
         $new_semaine = new Semaine();
         $new_semaine->setProposeur($membre);
