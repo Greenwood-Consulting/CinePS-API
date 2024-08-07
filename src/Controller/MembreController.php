@@ -41,7 +41,7 @@ class MembreController extends AbstractController
     }
 
 
-    #[Route('/api/actifMembre/{id_membre}', name: 'detailMembre', methods: ['PATCH'])]
+    #[Route('/api/actifMembre/{id_membre}', name: 'actifMembre', methods: ['PATCH'])]
      public function updateMembre(int $id_membre, EntityManagerInterface $em, Request $request, SerializerInterface $serializer, MembreRepository $membreRepository): JsonResponse
     {
         $array_request = json_decode($request->getContent(), true);
