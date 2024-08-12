@@ -34,7 +34,8 @@ class IsPropositionTermineeController extends AbstractController
         //Récupere le nombre de membres - 1
         $queryBuilder_get_membre = $entityManager->createQueryBuilder();
         $queryBuilder_get_membre->select('COUNT(m.id)')
-        ->from(Membre::class, 'm');
+        ->from(Membre::class, 'm')
+        ->where('m.actif = 1');
 
         $resultat_count_membre = $queryBuilder_get_membre->getQuery()->getResult();
         $get_int_resultat_count_membre = $resultat_count_membre[0][1];

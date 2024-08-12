@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Membre;
 use App\Repository\MembreRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,5 +37,22 @@ class MembreController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
 
-    
+    // Modifier l'état d'activation d'un membre
+    #[Route('/api/actifMembre/{id_membre}', name: 'actifMembre', methods: ['PATCH'])]
+     public function updateMembre(int $id_membre, EntityManagerInterface $em, Request $request, SerializerInterface $serializer, MembreRepository $membreRepository): JsonResponse
+    {
+        $array_request = json_decode($request->getContent(), true);
+
+        $membre = $membreRepository->findOneById($id_membre);
+        
+        if (isset($array_request['actif'])){
+            $membre->setActif($array_request['actif']);
+        }
+
+        $em->persist($membre);
+        $em->flush();
+
+        $jsonProposition = $serializer->serialize($membre, 'json', ['groups' => 'getPropositions']); 
+        return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
+    }
 }
