@@ -49,77 +49,79 @@ class PropositionController extends AbstractController
 
 
     #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante')]
-    public function getPropositionPerdante($proposeur_id, Request $request, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    public function getPropositionPerdante(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
 
-    // Récupérer toutes les semaines pour le proposeur donné
-    $semaines = $semaineRepository->findBy(['proposeur' => $proposeur_id]);
+        // Récupérer toutes les semaines pour le proposeur donné
+        $semaines = $semaineRepository->findBy(['proposeur' => $proposeur_id]);
 
-    foreach ($semaines as $semaine) {
-        $id_semaine = $semaine->getId();
+        $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
 
-        // Sous-requête pour obtenir le score le plus élevé
-        $subQuery = $entityManager->createQueryBuilder()
-            ->select('MAX(p2.score)')
-            ->from(Proposition::class, 'p2')
-            ->leftJoin('p2.semaine', 's2')
-            ->where('s2.id = :id');
 
-        // Requête principale pour récupérer les films sauf celui avec le score le plus élevé
-        $queryBuilder_get_proposition = $entityManager->createQueryBuilder();
-        $queryBuilder_get_proposition->select('p')
-            ->from(Proposition::class, 'p')
-            ->leftJoin('p.semaine', 's')
-            ->where('s.id = :id')
-            ->andWhere('p.score < (' . $subQuery->getDQL() . ')')
-            ->setParameter('id', $id_semaine);
+        $all_propositions = [];
 
-        $get_proposition = $queryBuilder_get_proposition->getQuery()->getResult();
+        foreach ($semaines as $semaine) {
+            $id_semaine = $semaine->getId();
 
-        if (empty($get_proposition)) {
-            $titre_film = $request->request->get('titre_film');
-            $sortie_film = $request->request->get('sortie_film');
-            $lien_imdb = $request->request->get('imdb_film');
+            // Sous-requête pour obtenir le score le plus élevé
+            $subQuery = $entityManager->createQueryBuilder()
+                ->select('MAX(p2.score)')
+                ->from(Proposition::class, 'p2')
+                ->leftJoin('p2.semaine', 's2')
+                ->where('s2.id = :id')
+                ->setParameter('id', $id_semaine);
 
-            // Si le champ titre_film est null ou vide, passer à l'itération suivante
-            if ($titre_film === null || $titre_film === '') {
-                continue;
-            }
+            // Requête principale pour récupérer les propositions sauf celle avec le score le plus élevé
+            $queryBuilder_get_proposition = $entityManager->createQueryBuilder();
+            $queryBuilder_get_proposition->select('p')
+                ->from(Proposition::class, 'p')
+                ->leftJoin('p.semaine', 's')
+                ->where('s.id = :id')
+                ->andWhere($queryBuilder_get_proposition->expr()->lt('p.score', '(' . $subQuery->getDQL() . ')'))
+                ->setParameter('id', $id_semaine);
 
-            // Créer un nouvel objet Film
-            $film = new Film();
-            $film->setTitre($titre_film);
-            $film->setDate(new \DateTime());
-            $film->setSortieFilm($sortie_film);
-            $film->setImdb($lien_imdb);
-            
-            // Créer une nouvelle proposition
-            $proposition = new Proposition();
-            $proposition->setSemaine($semaine);
-            $proposition->setFilm($film);
-            $proposition->setScore(36);
-            
-            $entityManager->persist($film);
-            $entityManager->persist($proposition);
-            $entityManager->flush();
-            
-            // Ajouter la nouvelle proposition à $proposition_perdante
-            $proposition_perdante[] = $proposition;
-        } else {
-            // Mélanger les propositions existantes et les ajouter à $proposition_perdante
-            shuffle($get_proposition);
-            $proposition_perdante = array_merge($proposition_perdante, $get_proposition);
+            $get_proposition = $queryBuilder_get_proposition->getQuery()->getResult();
+
+            // Ajouter les propositions à la liste globale
+            $all_propositions = array_merge($all_propositions, $get_proposition);
         }
+
+        shuffle($all_propositions);
+        $random_propositions = array_slice($all_propositions, 0, 5);
+
+        foreach ($random_propositions as $proposition_existante) {
+            // Récupérer l'objet Film associé à la proposition existante
+            $film_existante = $proposition_existante->getFilm();
+
+            // Créer une nouvelle instance de Film avec les mêmes données
+            $new_film = new Film();
+            $new_film->setTitre($film_existante->getTitre());
+            $new_film->setDate(new \DateTime()); // Par exemple, la date d'aujourd'hui
+            $new_film->setSortieFilm($film_existante->getSortieFilm());
+            $new_film->setImdb($film_existante->getImdb());
+
+            $entityManager->persist($new_film);
+
+            // Créer une nouvelle instance de Proposition en clonant les données de l'existante
+            $new_proposition = new Proposition();
+            $new_proposition->setSemaine($semaine_courante);
+            $new_proposition->setFilm($new_film);
+            $new_proposition->setScore(36);
+
+            // Persister la nouvelle proposition en base de données
+            $entityManager->persist($new_proposition);
+
+            // Ajouter à la liste des propositions perdantes pour la réponse
+            $proposition_perdante[] = $new_proposition;
+        }
+
+        $entityManager->flush();
+
+        $jsonProposition = $serializer->serialize($proposition_perdante, 'json', ['groups' => 'getPropositions']);
+
+        return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
-    // Mélanger toutes les propositions perdantes et en retourner 5 aléatoirement
-    shuffle($proposition_perdante);
-    $random_proposition_perdante = array_slice($proposition_perdante, 0, 5);
-
-    $jsonProposition = $serializer->serialize($random_proposition_perdante, 'json', ['groups' => 'getPropositions']);
-
-    return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-    }
 
 }
