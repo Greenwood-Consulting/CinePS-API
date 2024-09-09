@@ -54,13 +54,6 @@ class SemaineController extends AbstractController
         
     }
     
-    #[Route('/api/currentSemaine2', name: 'currentSemaine2', methods: ['GET'])]
-    public function currentSemaine2(SerializerInterface $serializer, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository): JsonResponse
-    {
-        $jsonFilmProposes = $serializer->serialize($currentSemaine->getCurrentSemaine($semaineRepository), 'json', ['groups' => 'getPropositions']);
-        return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
-    }
-
     // Retourne l'onjet de la semaine en cours
     #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
     public function getAnciennesSemaines(CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
