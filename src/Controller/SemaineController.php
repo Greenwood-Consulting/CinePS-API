@@ -54,30 +54,6 @@ class SemaineController extends AbstractController
         
     }
     
-    // Retourne l'onjet de la semaine en cours
-    #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
-    public function getAnciennesSemaines(CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
-
-        //Récupère les semaines plus anciennes que $friday_current_semaine
-        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-        $queryBuilder_get_id_current_semaine->select('s')
-        ->from(Semaine::class, 's')
-        ->where('s.jour < :jour')
-        ->orderBy('s.jour', 'DESC')
-        ->setParameter('jour', $friday_current_semaine);
-
-        $result_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-        
-        if($result_current_semaine) {
-            $jsonProposition = $serializer->serialize($result_current_semaine, 'json', ['groups' => 'getPropositions']);
-            return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(["error" => "Not Found"], 404);
-    }
-    
-
     #[Route('/api/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
     public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
     {
