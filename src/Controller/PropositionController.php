@@ -84,6 +84,7 @@ class PropositionController extends AbstractController
 
             $get_proposition = $queryBuilder_get_proposition->getQuery()->getResult();
 
+            // Ajouter les propositions à la liste globale
             $all_propositions = array_merge($all_propositions, $get_proposition);
         }
 
@@ -109,12 +110,12 @@ class PropositionController extends AbstractController
 
                 $entityManager->persist($new_film);
 
+                // Créer une nouvelle instance de Proposition en clonant les données de l'existante
                 $new_proposition = new Proposition();
                 $new_proposition->setSemaine($semaine_courante);
                 $new_proposition->setFilm($new_film);
                 $new_proposition->setScore(36);
 
-                // Persister la nouvelle proposition en base de données
                 $entityManager->persist($new_proposition);
 
                 // Ajouter à la liste des propositions perdantes pour la réponse
@@ -122,8 +123,14 @@ class PropositionController extends AbstractController
             }
         }
 
+        // Modifier la propriété propositionTermine de la semaine courante
+        $semaine_courante->setPropositionTermine(true);
+
+        // Sauvegarder les nouvelles propositions, films, et la mise à jour de la semaine dans la base de données
+        $entityManager->persist($semaine_courante);
         $entityManager->flush();
 
+        // Sérialiser les résultats et retourner en JSON
         $jsonProposition = $serializer->serialize($proposition_perdante, 'json', ['groups' => 'getPropositions']);
 
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
