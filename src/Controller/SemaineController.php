@@ -20,17 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SemaineController extends AbstractController
 {
-    #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
-    public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
-    {
-        $semaine = $semaineRepository->find($id);
-        if($semaine) {
-            $jsonSemaine = $serializer->serialize($semaine, 'json', ['groups' => 'getPropositions']);
-            return new JsonResponse($jsonSemaine, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);    
-    }
-
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
     public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
