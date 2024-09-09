@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AVoteController extends AbstractController
 {
     
-    // Indique si l'utilisateur a voté pour alse amine en cours
+    // Indique si l'utilisateur a voté pour la semamine en cours
     #[Route('/api/aVoteCurrentSemaine/{id_membre}', name:'AVoteCurrentSemaine', methods: ['GET'])]
     public function aVoteCurrentSemaine(CurrentSemaine $currentSemaine, int $id_membre, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
@@ -28,7 +28,6 @@ class AVoteController extends AbstractController
         ->setParameters(array('semaine' => $id_current_semaine, 'votant' => $id_membre));
 
         $resultats_aVote = $queryBuilder_get_aVote->getQuery()->getResult();
-
 
         if (empty($resultats_aVote)) {
             $result = $serializer->serialize(false, 'json');

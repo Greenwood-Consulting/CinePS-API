@@ -17,15 +17,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
-
-
 class AdminController extends AbstractController
 {
     #[Route('/api/newmembre', name:"createMembre", methods: ['POST'])]
     public function createMembre(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse 
     {
-
         $membre = $serializer->deserialize($request->getContent(), Membre::class, 'json');
         $em->persist($membre);
         $em->flush();
@@ -40,7 +36,6 @@ class AdminController extends AbstractController
     #[Route('/api/newSemaine', name:"createSemaine", methods: ['POST'])]
     public function createSemaine(Request $request, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse 
     {
-
         $array_request = json_decode($request->getContent(), true);
         $membre = $membreRepository->findOneById($array_request['proposeur_id']);
         $jour = DateTime::createFromFormat('Y-m-d', $array_request['jour']);
@@ -51,7 +46,7 @@ class AdminController extends AbstractController
         $new_semaine->setJour($jour);
         $new_semaine->setPropositionTermine(false);
         $new_semaine->setTheme("");
-        $new_semaine->settype($typeSemaine);
+        $new_semaine->setType($typeSemaine);
 
 
         $em->persist($new_semaine);
@@ -63,7 +58,5 @@ class AdminController extends AbstractController
 
         return new JsonResponse($jsonSemaine, Response::HTTP_CREATED, ["Location" => $location], true);
     }
-
-
 
 }
