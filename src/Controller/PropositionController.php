@@ -56,10 +56,11 @@ class PropositionController extends AbstractController
         // Récupérer toutes les semaines pour le proposeur donné
         $semaines = $semaineRepository->findBy(['proposeur' => $proposeur_id]);
 
+        // Récupérer la semaine courante
         $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
 
-
         $all_propositions = [];
+        $film_titres = []; // Pour stocker les titres des films déjà ajoutés
 
         foreach ($semaines as $semaine) {
             $id_semaine = $semaine->getId();
@@ -83,10 +84,10 @@ class PropositionController extends AbstractController
 
             $get_proposition = $queryBuilder_get_proposition->getQuery()->getResult();
 
-            // Ajouter les propositions à la liste globale
             $all_propositions = array_merge($all_propositions, $get_proposition);
         }
 
+        // Mélanger les propositions et en récupérer 5 aléatoirement
         shuffle($all_propositions);
         $random_propositions = array_slice($all_propositions, 0, 5);
 
@@ -94,26 +95,31 @@ class PropositionController extends AbstractController
             // Récupérer l'objet Film associé à la proposition existante
             $film_existante = $proposition_existante->getFilm();
 
-            // Créer une nouvelle instance de Film avec les mêmes données
-            $new_film = new Film();
-            $new_film->setTitre($film_existante->getTitre());
-            $new_film->setDate(new \DateTime()); // Par exemple, la date d'aujourd'hui
-            $new_film->setSortieFilm($film_existante->getSortieFilm());
-            $new_film->setImdb($film_existante->getImdb());
+            // Vérifier si le film existe déjà dans la liste des titres ajoutés
+            if (!in_array($film_existante->getTitre(), $film_titres)) {
+                // Ajouter le titre du film à la liste des films déjà ajoutés
+                $film_titres[] = $film_existante->getTitre();
 
-            $entityManager->persist($new_film);
+                // Créer une nouvelle instance de Film avec les mêmes données
+                $new_film = new Film();
+                $new_film->setTitre($film_existante->getTitre());
+                $new_film->setDate(new \DateTime()); // Par exemple, la date d'aujourd'hui
+                $new_film->setSortieFilm($film_existante->getSortieFilm());
+                $new_film->setImdb($film_existante->getImdb());
 
-            // Créer une nouvelle instance de Proposition en clonant les données de l'existante
-            $new_proposition = new Proposition();
-            $new_proposition->setSemaine($semaine_courante);
-            $new_proposition->setFilm($new_film);
-            $new_proposition->setScore(36);
+                $entityManager->persist($new_film);
 
-            // Persister la nouvelle proposition en base de données
-            $entityManager->persist($new_proposition);
+                $new_proposition = new Proposition();
+                $new_proposition->setSemaine($semaine_courante);
+                $new_proposition->setFilm($new_film);
+                $new_proposition->setScore(36);
 
-            // Ajouter à la liste des propositions perdantes pour la réponse
-            $proposition_perdante[] = $new_proposition;
+                // Persister la nouvelle proposition en base de données
+                $entityManager->persist($new_proposition);
+
+                // Ajouter à la liste des propositions perdantes pour la réponse
+                $proposition_perdante[] = $new_proposition;
+            }
         }
 
         $entityManager->flush();
@@ -122,6 +128,7 @@ class PropositionController extends AbstractController
 
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
+
 
 
 }
