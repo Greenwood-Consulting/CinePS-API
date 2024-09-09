@@ -54,32 +54,6 @@ class SemaineController extends AbstractController
         
     }
     
-
-    // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
-    #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
-    public function getIdCurrentSemaine(SerializerInterface $serializer, CurrentSemaine $currentSemaine, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
-
-        //Récupère la propositionTerminé de id_semaine
-        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-        $queryBuilder_get_id_current_semaine->select('s.id')
-        ->from(Semaine::class, 's')
-        ->where('s.jour = :jour')
-        ->setParameter('jour', $friday_current_semaine);
-
-        $result_id_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-        
-        if ($result_id_current_semaine){
-            $id_current_semaine = $result_id_current_semaine[0]['id'];
-        } else { // la semaine courrant n'exite pas encore dans la base de données
-            $id_current_semaine = 0;
-        }
-        $array_id_current_semaine = array("id_current_semaine" => $id_current_semaine);
-        $json_id_current_semaine = $serializer->serialize($array_id_current_semaine, 'json');
-        return new JsonResponse ($json_id_current_semaine, Response::HTTP_OK, [], true);
-    }
-
     #[Route('/api/currentSemaine2', name: 'currentSemaine2', methods: ['GET'])]
     public function currentSemaine2(SerializerInterface $serializer, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository): JsonResponse
     {
