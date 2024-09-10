@@ -6,7 +6,6 @@ use DateTime;
 use App\Entity\Film;
 use App\Entity\Semaine;
 use App\Entity\Proposition;
-use Psr\Log\LoggerInterface;
 use App\Service\CurrentSemaine;
 use App\Repository\FilmRepository;
 use App\Repository\SemaineRepository;
