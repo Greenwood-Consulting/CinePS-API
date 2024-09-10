@@ -20,17 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SemaineController extends AbstractController
 {
-    #[Route('/api/semaine/{id}', name: 'detailSemaine', methods: ['GET'])]
-    public function getDetailSemaine(int $id, SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
-    {
-        $semaine = $semaineRepository->find($id);
-        if($semaine) {
-            $jsonSemaine = $serializer->serialize($semaine, 'json', ['groups' => 'getPropositions']);
-            return new JsonResponse($jsonSemaine, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);    
-    }
-
     // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
     public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
@@ -65,63 +54,6 @@ class SemaineController extends AbstractController
         
     }
     
-
-    // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
-    #[Route('/api/idCurrentSemaine', name: 'idCurrentSemaine', methods: ['GET'])]
-    public function getIdCurrentSemaine(SerializerInterface $serializer, CurrentSemaine $currentSemaine, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
-
-        //Récupère la propositionTerminé de id_semaine
-        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-        $queryBuilder_get_id_current_semaine->select('s.id')
-        ->from(Semaine::class, 's')
-        ->where('s.jour = :jour')
-        ->setParameter('jour', $friday_current_semaine);
-
-        $result_id_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-        
-        if ($result_id_current_semaine){
-            $id_current_semaine = $result_id_current_semaine[0]['id'];
-        } else { // la semaine courrant n'exite pas encore dans la base de données
-            $id_current_semaine = 0;
-        }
-        $array_id_current_semaine = array("id_current_semaine" => $id_current_semaine);
-        $json_id_current_semaine = $serializer->serialize($array_id_current_semaine, 'json');
-        return new JsonResponse ($json_id_current_semaine, Response::HTTP_OK, [], true);
-    }
-
-    #[Route('/api/currentSemaine2', name: 'currentSemaine2', methods: ['GET'])]
-    public function currentSemaine2(SerializerInterface $serializer, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository): JsonResponse
-    {
-        $jsonFilmProposes = $serializer->serialize($currentSemaine->getCurrentSemaine($semaineRepository), 'json', ['groups' => 'getPropositions']);
-        return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
-    }
-
-    // Retourne l'onjet de la semaine en cours
-    #[Route('/api/anciennesSemaines', name: 'anciennesSemaines', methods: ['GET'])]
-    public function getAnciennesSemaines(CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $friday_current_semaine = $currentSemaine->getFridayCurrentSemaine();
-
-        //Récupère les semaines plus anciennes que $friday_current_semaine
-        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-        $queryBuilder_get_id_current_semaine->select('s')
-        ->from(Semaine::class, 's')
-        ->where('s.jour < :jour')
-        ->orderBy('s.jour', 'DESC')
-        ->setParameter('jour', $friday_current_semaine);
-
-        $result_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-        
-        if($result_current_semaine) {
-            $jsonProposition = $serializer->serialize($result_current_semaine, 'json', ['groups' => 'getPropositions']);
-            return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
-        }
-        return new JsonResponse(["error" => "Not Found"], 404);
-    }
-    
-
     #[Route('/api/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
     public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
     {
