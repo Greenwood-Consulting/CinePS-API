@@ -48,6 +48,9 @@ class Semaine
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Proposition $propositionGagnante = null;
+
     public function __construct()
     {
         $this->propositions = new ArrayCollection();
@@ -176,6 +179,18 @@ class Semaine
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getPropositionGagnante(): ?Proposition
+    {
+        return $this->propositionGagnante;
+    }
+
+    public function setPropositionGagnante(?Proposition $propositionGagnante): self
+    {
+        $this->propositionGagnante = $propositionGagnante;
 
         return $this;
     }
