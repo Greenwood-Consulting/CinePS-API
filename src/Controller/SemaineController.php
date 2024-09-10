@@ -158,7 +158,7 @@ class SemaineController extends AbstractController
 
     // Met à jour une semaine
     #[Route('/api/semaine/{id_semaine}', name: 'updateSemaine', methods: ['PATCH'])]
-    public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, PropositionRepository $propositionRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $array_request = json_decode($request->getContent(), true);
 
@@ -169,6 +169,10 @@ class SemaineController extends AbstractController
         }
         if (isset($array_request['theme'])){
             $semaine->setTheme($array_request['theme']);
+        }
+        if (isset($array_request['proposition_gagnante'])){
+            $proposition = $propositionRepository->findOneById($array_request['proposition_gagnante']);
+            $semaine->setPropositionGagnante($proposition);
         }
 
         $em->persist($semaine);
