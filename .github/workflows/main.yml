@@ -21,7 +21,7 @@ jobs:
       run: |
         lftp -f "
         set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-        open -u ${{ secrets.PREPROD_FTP_USER }},${{ secrets.PREPROD_FTP_PASSWORD }} sftp://${{ secrets.PREPROD_FTP_HOST }}
+        open -u ${{ secrets.PREPROD_SFTP_USER }},${{ secrets.PREPROD_SFTP_PASSWORD }} sftp://${{ secrets.PREPROD_SFTP_HOST }}
         mirror -R ./ /lamp0/web/vhosts/preprod-ps-api.gc2.fr/htdocs --exclude .git/ --exclude .htaccess --exclude .env --exclude config/
         bye
         "
