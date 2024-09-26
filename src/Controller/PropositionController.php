@@ -149,41 +149,42 @@ class PropositionController extends AbstractController
         public function createPropositionOpenAI(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
         {
             // Création et configuration du client OpenAI
-            $client = OpenAI::client('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');
+            
 
             // Utilisation de l'API OpenAI pour obtenir des suggestions de films avec Will Smith
-            $message = "Peux-tu me proposer une liste de 5 films d'horreur, avec leur date de sortie et le lien IMDb ? Chaque film doit être présenté de cette manière : Titre du film (année de sortie) ## lien IMDb du film. Entre chaque film il faut ajouter un séparateur qui est : @@ . Ne mets pas de separateur après le dernier film.  Ne mets pas de tiret ou de numéros avant les titres de films.";
+            $message_user = "Je veux regarder un films avec des super héros marvel.";
+            $message_assistant = "[{\"titre_film\": \"Iron Man\", \"sortie_film\": \"2008\", \"imdb_film\": \"https://www.imdb.com/title/tt0371746/\" }, {\"titre_film\": \"The Dark Knight\", \"sortie_film\": \"2008\", \"imdb_film\": \"https://www.imdb.com/title/tt0468569/\" }, {\"titre_film\": \"Inception\", \"sortie_film\": \"2010\", \"imdb_film\": \"https://www.imdb.com/title/tt1375666/\" }, {\"titre_film\": \"Interstellar\", \"sortie_film\": \"2014\", \"imdb_film\": \"https://www.imdb.com/title/tt0816692/\" }, {\"titre_film\": \"Tenet\", \"sortie_film\": \"2020\", \"imdb_film\": \"https://www.imdb.com/title/tt6723592/\" }]";
+            $message_system = "Tu es un assistant qui a pour but de me proposer une liste de éxactement 5 films pas plus pas moins, ta réponse doit être au format JSON qui a la structure suivante : [{\"titre_film\": <Titre du film>, \"sortie_film\": <Année de sortie>, \"imdb_film\": <Lien IMDb du film> }].";
             $result = $client->chat()->create([
                 'model' => 'gpt-3.5-turbo',
                 'messages' => [
-                    ['role' => 'user', 'content' => $message],
+                    ['role' => 'user', 'content' => $message_user],
+                    ['role' => 'assistant', 'content' => $message_assistant],
+                    ['role' => 'system', 'content' => $message_system],
                 ],
+                'response_format' => ['type' => 'json_object']
             ]);
 
-            echo "<pre>";
-            print_r($result->choices);
+            $json_response_films = $result->choices[0]->message->content;
+            $json_response_array = json_decode($json_response_films, true);
+
+            echo "<pre> Tableaux";
+            
+            print_r($json_response_array);
             echo "</pre>";
 
-            // Initialisation du tableau de films
-            $filmsData = "";
-
-            // Diviser la chaîne de caractères pour obtenir les informations sur chaque film
-            $arrayFilms = explode("@@", $result->choices[0]->message->content);
-            echo "<pre>";
-            print_r($arrayFilms);
-            echo "</pre>";
 
             // Parcourir le tableau de films
-            foreach ($arrayFilms as $filmDataString) {
-                // Expression régulière pour capturer le titre du film, la date et le lien IMDb
-                $pattern = "/ ([\s\S]*?) \((\d{4})\) ## (https:\/\/www\.imdb\.com\/title\/tt\d+\/)/";
-
-                // Vérifie si la chaîne correspond au pattern
-                if (preg_match($pattern, $filmDataString, $matches)) {
+            foreach ($json_response_array['films'] as $filmDataArray) {
                     // Capturer les informations dans des variables
-                    $titre_film = $matches[1];
-                    $sortie_film = $matches[2];
-                    $lien_imdb = $matches[3];
+
+                    // echo "<pre> film";
+                    // print_r($filmDataArray);
+                    // echo "</pre>";
+                    
+                    $titre_film = $filmDataArray['titre_film'];
+                    $sortie_film = $filmDataArray['sortie_film'];
+                    $lien_imdb = $filmDataArray['imdb_film'];
 
                     // Créer et configurer l'objet Film
                     $film = new Film();
@@ -209,10 +210,6 @@ class PropositionController extends AbstractController
 
                     // Enregistrer la proposition en base de données
                     $em->persist($proposition);
-                } else {
-                    // Afficher un message d'erreur si le film n'est pas extrait correctement
-                    echo "Erreur lors de l'extraction des informations du film: $filmDataString\n";
-                }
             }
 
             // Flush des changements en base de données
