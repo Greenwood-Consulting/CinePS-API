@@ -1,0 +1,29 @@
+name: Upload via SFTP
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le workflow à chaque push sur la branche main
+  workflow_dispatch:  # Permet d'exécuter le workflow manuellement
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Récupère ton dépôt
+
+    - name: Install lftp
+      run: sudo apt-get install -y lftp  # Installation de lftp, un outil SFTP/FTP
+
+    - name: Upload files via SFTP
+      run: |
+        lftp -f "
+        set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+        open -u ${{ secrets.PREPROD_FTP_USER }},${{ secrets.PREPROD_FTP_PASSWORD }} sftp://${{ secrets.PREPROD_FTP_HOST }}
+        mirror -R ./ /lamp0/web/vhosts/preprod-ps-api.gc2.fr/htdocs --exclude .git/ --exclude .htaccess --exclude .env --exclude config/
+        bye
+        "
+
+            
