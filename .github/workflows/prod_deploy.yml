@@ -6,11 +6,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    steps:
-    - name: Demander confirmation manuelle
-      run: read -p "Confirmez-vous l'upload SFTP ? (y/n): " CONFIRM && if [ "$CONFIRM" != "y" ]; then exit 1; fi
-        
+    environment:
+      name: production
+      
+    steps:  
     - name: Checkout code
       uses: actions/checkout@v2  # Récupère ton dépôt
 
