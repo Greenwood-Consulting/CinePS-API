@@ -48,6 +48,7 @@ class Semaine
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
+    #[Groups(["getPropositions"])]
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Proposition $propositionGagnante = null;
 

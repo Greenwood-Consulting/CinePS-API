@@ -42,7 +42,7 @@ class FilmVictorieux
         $jsonfilmsAvecMemeScore = $serializer->serialize($filmsAvecMemeScore, 'json', ['groups' => 'getPropositions']);
         $arrayFilmsAvecMemeScore =  json_decode($jsonfilmsAvecMemeScore, true);
 
-        $film_victorieux = $arrayFilmsAvecMemeScore[0];
+        $film_victorieux = $arrayFilmsAvecMemeScore;
 
         $proposition_film_victorieux = json_encode($film_victorieux, true);
         return $film_victorieux;
