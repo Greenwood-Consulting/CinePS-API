@@ -16,19 +16,19 @@ class Semaine
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?\DateTimeInterface $jour = null;
 
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?bool $proposition_termine = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?string $theme = null;
 
     #[ORM\OneToMany(mappedBy: 'semaine', targetEntity: Proposition::class, orphanRemoval: true)]
@@ -37,14 +37,14 @@ class Semaine
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?Membre $proposeur = null;
 
     #[ORM\OneToMany(mappedBy: 'semaine', targetEntity: AVote::class, orphanRemoval: true)]
     #[Groups(["getPropositions"])]
     private Collection $votants;
 
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 

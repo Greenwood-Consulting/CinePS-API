@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FilmRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -19,20 +20,29 @@ class Film
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre du film est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit faire au moins {{ limit }} caractères", maxMessage: "Le titre ne peut pas faire plus de {{ limit }} caractères")]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?string $titre = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $sortie_film = null;
 
     #[ORM\Column(length: 600)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?string $imdb = null;
+
+    #[Groups(["filmsGagnants"])]
+    #[ORM\OneToMany(mappedBy: 'film', targetEntity: Proposition::class)]
+    private Collection $propositions;
+
+    public function __construct()
+    {
+        $this->propositions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -86,4 +96,13 @@ class Film
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Proposition>
+     */
+    public function getPropositions(): Collection
+    {
+        return $this->propositions;
+    }
+
 }

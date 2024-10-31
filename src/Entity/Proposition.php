@@ -13,20 +13,21 @@ class Proposition
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'], inversedBy: 'propositions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getPropositions"])]
     private ?Film $film = null;
 
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $score = null;
 
     #[ORM\ManyToOne(inversedBy: 'propositions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["filmsGagnants"])]
     private ?Semaine $semaine = null;
 
     public function getId(): ?int

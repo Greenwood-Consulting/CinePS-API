@@ -14,11 +14,11 @@ class Membre
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "filmsGagnants"])]
     private ?string $Nom = null;
 
     #[Groups(["getPropositions"])]
