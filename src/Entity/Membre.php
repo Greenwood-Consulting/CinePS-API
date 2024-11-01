@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MembreRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MembreRepository::class)]
@@ -100,6 +101,63 @@ class Membre
         $this->actif = $actif;
 
         return $this;
+    }
+
+    public function getSatisfactionVotes(EntityManagerInterface $entityManager): ?float
+    {
+        $query = $entityManager->createQuery(
+            'SELECT v
+            FROM App\Entity\Vote v
+            JOIN v.proposition p
+            JOIN p.semaine s
+            WHERE (p.id = s.propositionGagnante
+            OR (s.propositionGagnante IS NULL AND p.id = (
+            SELECT MIN(p2.id)
+            FROM App\Entity\Proposition p2
+            WHERE p2.semaine = s AND p2.score = (
+                SELECT MAX(p3.score)
+                FROM App\Entity\Proposition p3
+                WHERE p3.semaine = s
+            )
+            )))
+            AND v.membre = :currentUser'
+        )->setParameter('currentUser', $this->getId());
+
+        $votes = $query->getResult();
+
+        if (count($votes) === 0) {
+            return null;
+        }
+
+        $totalVotes = 0;
+        foreach ($votes as $vote) {
+            $totalVotes += $vote->getVote();
+        }
+
+        return $totalVotes / count($votes);
+
+    }
+
+    public function getNoteMoyenne (EntityManagerInterface $entityManager): ?float
+    {
+        $query = $entityManager->createQuery(
+            'SELECT n
+            FROM App\Entity\Note n
+            WHERE n.membre = :currentUser'
+        )->setParameter('currentUser', $this->getId());
+
+        $notes = $query->getResult();
+
+        if (count($notes) === 0) {
+            return null;
+        }
+
+        $totalNotes = 0;
+        foreach ($notes as $note) {
+            $totalNotes += $note->getNote();
+        }
+
+        return $totalNotes / count($notes);
     }
 
 }
