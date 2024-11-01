@@ -77,14 +77,14 @@ class HistoriqueController extends AbstractController
                         $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => $arrayVote[0]['vote']);
                     }
 
-                    // Récupérer la note de l'utilisateur pour cette proposition
+                    // Récupérer la note de l'utilisateur pour ce film
                     $queryBuilder_get_note = $entityManager->createQueryBuilder();
                     $queryBuilder_get_note->select('n.note')
-                    ->from(Note::class, 'n')
-                    ->where('n.proposition = :id_proposition')
-                    ->andWhere('n.membre = :id_membre')
-                    ->setParameters(array('id_proposition' => $proposition['id'], 'id_membre' => $membre['id']));
-            
+                        ->from(Note::class, 'n')
+                        ->where('n.film = :id_film')
+                        ->andWhere('n.membre = :id_membre')
+                        ->setParameters(array('id_film' => $proposition['film']['id'], 'id_membre' => $membre['id']));
+
                     $resultat_note = $queryBuilder_get_note->getQuery()->getResult();
                     $jsonResultatNote = $serializer->serialize($resultat_note, 'json', ['groups' => 'getPropositions']);
                     $arrayNote = json_decode($jsonResultatNote, true);
