@@ -17,7 +17,7 @@ class Note
     private ?int $note = null;
 
     #[ORM\ManyToOne]
-    private ?Proposition $proposition = null;
+    private ?Film $film = null;
 
     #[ORM\ManyToOne]
     private ?Membre $membre = null;
@@ -39,14 +39,14 @@ class Note
         return $this;
     }
 
-    public function getProposition(): ?Proposition
+    public function getFilm(): ?Film
     {
-        return $this->proposition;
+        return $this->film;
     }
 
-    public function setProposition(?Proposition $proposition): self
+    public function setFilm(?Film $film): self
     {
-        $this->proposition = $proposition;
+        $this->film = $film;
 
         return $this;
     }
