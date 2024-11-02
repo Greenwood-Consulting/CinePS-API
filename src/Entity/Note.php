@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\NoteRepository;
+use App\Entity\Film;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\NoteRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 class Note
@@ -14,12 +16,14 @@ class Note
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["filmsGagnants"])]
     private ?int $note = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'notes')]
     private ?Film $film = null;
 
     #[ORM\ManyToOne]
+    #[Groups(["filmsGagnants"])]
     private ?Membre $membre = null;
 
     public function getId(): ?int
