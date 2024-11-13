@@ -53,6 +53,7 @@ class Semaine
     private ?Proposition $propositionGagnante = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["getPropositions"])]
     private ?string $raison_proposition_choisie = null;
 
     public function __construct()
