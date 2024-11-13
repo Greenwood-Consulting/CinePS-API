@@ -134,17 +134,6 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
-
-    #[Route('/api/Allproposition', name: 'app_Allproposition')]
-    public function getAllProposition(PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
-    {
-
-        $propositionList = $propositionRepository->findAll();
-
-        $jsonPropositionList = $serializer->serialize($propositionList, 'json');
-        return new JsonResponse($jsonPropositionList, Response::HTTP_OK, [], true);
-    }
-
     #[Route('/api/propositionOpenAI', name: 'createPropositionApi', methods: ['POST'])]
     public function createPropositionOpenAI(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
     {
