@@ -166,6 +166,21 @@ class SemaineController extends AbstractController
 
         if (isset($array_request['proposition_terminee'])){
             $semaine->setPropositionTermine($array_request['proposition_terminee']);
+
+            // envoyer un mail à tous les membres pour les informer que les propositions sont faites
+            $membres = $membreRepository->findAll();
+            foreach ($membres as $membre) {
+                $to = $membre->getMail();
+                $subject = 'CinePS - Les propositions sont faites, tu peux voter !';
+                $message = 'Bonjour ' . $membre->getPrenom() . ',
+                            
+                            Les propositions de films pour la prochaine PS sont faites, tu peux donc voter sur le site http://ps.gc2.fr';
+                $headers = 'From: ps@gc2.fr' . "\r\n" .
+                           'Reply-To: ps@gc2.fr' . "\r\n" .
+                           'X-Mailer: PHP/' . phpversion();
+                
+                mail($to, $subject, $message, $headers);
+            }
         }
         if (isset($array_request['theme'])){
             $semaine->setTheme($array_request['theme']);
