@@ -141,7 +141,7 @@ class PropositionController extends AbstractController
         $theme = $array_request['theme'];
 
         // Création et configuration du client OpenAI
-        $client = OpenAI::client('');
+        $client = OpenAI::client($_ENV['OPENAI_KEY']);
 
         // Utilisation de l'API OpenAI pour obtenir des suggestions de films sur le thème entré en paramètre de la requête
         $message_user = "Je veux que tu me proposes cinq films sur le thème suivant : ".$theme;
@@ -169,9 +169,9 @@ class PropositionController extends AbstractController
                     "imdb_film": "https://www.imdb.com/title/tt1702425/"
                 },
                 {
-                    "titre_film": "Quentin Dupieux, filmer fait penser 	",
-                    "sortie_film": "2023",
-                    "imdb_film": "https://www.imdb.com/title/tt28789459/"
+                    "titre_film": "Star Wars, épisode II : L\'Attaque des clones",
+                    "sortie_film": "2002",
+                    "imdb_film": "https://www.imdb.com/title/tt0121765/"
                 }
             ]
         }';
@@ -199,9 +199,9 @@ class PropositionController extends AbstractController
                         "imdb_film": "https://www.imdb.com/title/tt1702425/"
                     },
                     {
-                        "titre_film": "Quentin Dupieux, filmer fait penser 	",
-                        "sortie_film": "2023",
-                        "imdb_film": "https://www.imdb.com/title/tt28789459/"
+                        "titre_film": "Star Wars, épisode II : L\'Attaque des clones",
+                        "sortie_film": "2002",
+                        "imdb_film": "https://www.imdb.com/title/tt0121765/"
                     }
                 ]
             }
@@ -225,7 +225,7 @@ class PropositionController extends AbstractController
         // Parcourir le tableau de films
         foreach ($json_response_array['films'] as $filmDataArray) {
                 // Capturer les informations dans des variables
-                $titre_film = $filmDataArray['titre_film'];
+                $titre_film = addslashes($filmDataArray['titre_film']);
                 $sortie_film = $filmDataArray['sortie_film'];
                 $lien_imdb = $filmDataArray['imdb_film'];
 
