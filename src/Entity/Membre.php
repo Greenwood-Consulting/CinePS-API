@@ -160,4 +160,17 @@ class Membre
         return $totalNotes / count($notes);
     }
 
+    public function getNbNotes(EntityManagerInterface $entityManager): ?int
+    {
+        $query = $entityManager->createQuery(
+            'SELECT n
+            FROM App\Entity\Note n
+            WHERE n.membre = :currentUser'
+        )->setParameter('currentUser', $this->getId());
+
+        $notes = $query->getResult();
+
+        return count($notes);
+    }
+
 }
