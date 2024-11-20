@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use DateTime;
+use App\Entity\Film;
 use App\Entity\Note;
 use App\Entity\Vote;
 use App\Entity\Semaine;
 use App\Service\CurrentSemaine;
+use App\Repository\FilmRepository;
 use App\Repository\MembreRepository;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,15 +54,6 @@ class SemaineController extends AbstractController
             return new JsonResponse(["error" => "Not Found"], 404);
         }
         
-    }
-    
-    #[Route('/api/filmsProposes/{id_semaine}', name: 'filmsProposes', methods: ['GET'])]
-    public function filmsProposes(int $id_semaine, PropositionRepository $propositionRepository, SerializerInterface $serializer): JsonResponse
-    {
-        $filmsProposes = $propositionRepository->findBySemaine($id_semaine);
-        $jsonFilmProposes = $serializer->serialize($filmsProposes, 'json', ['groups' => 'getPropositions']);
-        return new JsonResponse ($jsonFilmProposes, Response::HTTP_OK, [], true);
-
     }
 
     #[Route('/api/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
@@ -158,7 +151,7 @@ class SemaineController extends AbstractController
 
     // Met à jour une semaine
     #[Route('/api/semaine/{id_semaine}', name: 'updateSemaine', methods: ['PATCH'])]
-    public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, FilmRepository $filmRepository, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $array_request = json_decode($request->getContent(), true);
 
@@ -181,6 +174,22 @@ class SemaineController extends AbstractController
         if (isset($array_request['raison_changement_film'])){
             $semaine->setRaisonPropositionChoisie($array_request['raison_changement_film']);
         }
+
+        /* WIP PS de droit divin
+        if (isset($array_request['type_semaine']) && $array_request['type_semaine'] == 'PSDroitDivin'){
+            $semaine->setType('PSDroitDivin');
+
+            $film = new Film();
+            $film->setTitre($array_request['droit_divin_titre_film']);
+            $film->setDate(new DateTime());
+            $film->setSortieFilm($array_request['droit_divin_date_film']);
+            $film->setImdb($array_request['droit_divin_lien_imdb'] );
+        
+            $em->persist($film);
+
+            //$semaine->set
+        }
+        */
 
         $em->persist($semaine);
         $em->flush();
