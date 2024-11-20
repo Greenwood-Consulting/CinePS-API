@@ -115,15 +115,4 @@ class HistoriqueController extends AbstractController
         return new JsonResponse(["error" => "Not Found"], 404);
 
     }
-
-    // WIP
-    #[Route('/api/historique_proposeur/{id_membre}', name: 'app_historique_proposeur', methods: ['GET'])]
-    public function historique_membre(int $id_membre): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/HistoriqueController.php',
-        ]);
-    }
-
 }
