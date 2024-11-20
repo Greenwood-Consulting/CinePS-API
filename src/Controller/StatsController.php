@@ -69,6 +69,7 @@ class StatsController extends AbstractController
             $usersNotesMoyennes[] = [
             'user' => $user,
             'noteMoyenne' => $noteMoyenne,
+            'nbNotes' => $user->getNbNotes($entityManager),
             ];
         }
         $usersNotesMoyennes = array_filter($usersNotesMoyennes, function ($userNote) {
