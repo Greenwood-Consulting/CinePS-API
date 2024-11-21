@@ -175,9 +175,10 @@ class SemaineController extends AbstractController
             $semaine->setRaisonPropositionChoisie($array_request['raison_changement_film']);
         }
 
-        /* WIP PS de droit divin
-        if (isset($array_request['type_semaine']) && $array_request['type_semaine'] == 'PSDroitDivin'){
+
+        if (isset($array_request['type_semaine']) && $array_request['type_semaine'] === 'PSDroitDivin'){
             $semaine->setType('PSDroitDivin');
+
 
             $film = new Film();
             $film->setTitre($array_request['droit_divin_titre_film']);
@@ -187,9 +188,9 @@ class SemaineController extends AbstractController
         
             $em->persist($film);
 
-            //$semaine->set
+            $semaine->setFilmVu($film);
         }
-        */
+
 
         $em->persist($semaine);
         $em->flush();
