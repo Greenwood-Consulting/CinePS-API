@@ -50,9 +50,9 @@ class Semaine
 
     #[Groups(["getPropositions"])]
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Proposition $propositionGagnante = null;
+    private ?Film $filmVu = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
     #[Groups(["getPropositions"])]
     private ?string $raison_proposition_choisie = null;
 
@@ -188,14 +188,14 @@ class Semaine
         return $this;
     }
 
-    public function getPropositionGagnante(): ?Proposition
+    public function getFilmVu(): ?Film
     {
-        return $this->propositionGagnante;
+        return $this->filmVu;
     }
 
-    public function setPropositionGagnante(?Proposition $propositionGagnante): self
+    public function setFilmVu(?Film $filmVu): self
     {
-        $this->propositionGagnante = $propositionGagnante;
+        $this->filmVu = $filmVu;
 
         return $this;
     }
