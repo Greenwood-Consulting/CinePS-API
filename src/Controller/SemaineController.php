@@ -164,8 +164,8 @@ class SemaineController extends AbstractController
             $semaine->setTheme($array_request['theme']);
         }
         if (isset($array_request['proposition_gagnante'])){
-            $proposition = $propositionRepository->findOneById($array_request['proposition_gagnante']);
-            $semaine->setPropositionGagnante($proposition);
+            $film = $filmRepository->findOneById($array_request['proposition_gagnante']);
+            $semaine->setFilmVu($film);
         }
         if (isset($array_request['proposeur_id'])){
             $proposeur = $membreRepository->findOneById($array_request['proposeur_id']);
