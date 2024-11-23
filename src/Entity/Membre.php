@@ -110,8 +110,8 @@ class Membre
             FROM App\Entity\Vote v
             JOIN v.proposition p
             JOIN p.semaine s
-            WHERE (p.id = s.propositionGagnante
-            OR (s.propositionGagnante IS NULL AND p.id = (
+            WHERE (p.id = s.filmVu
+            OR (s.filmVu IS NULL AND p.id = (
             SELECT MIN(p2.id)
             FROM App\Entity\Proposition p2
             WHERE p2.semaine = s AND p2.score = (

@@ -21,8 +21,8 @@ class ProfilController extends AbstractController
             ->from('App\Entity\Film', 'f')
             ->leftJoin('App\Entity\Proposition', 'p', 'WITH', 'p.film = f.id')
             ->leftJoin('App\Entity\Semaine', 's', 'WITH', 's.id = p.semaine')
-            ->where('s.propositionGagnante IS NOT NULL AND s.propositionGagnante = p.id')
-            ->orWhere('s.propositionGagnante IS NULL AND p.score = (
+            ->where('s.filmVu IS NOT NULL AND s.filmVu = p.id')
+            ->orWhere('s.filmVu IS NULL AND p.score = (
             SELECT MAX(p2.score) 
             FROM App\Entity\Proposition p2 
             WHERE p2.semaine = s.id
