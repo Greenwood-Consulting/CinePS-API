@@ -28,7 +28,12 @@ class NoteController extends AbstractController
         $note = new Note();
         $note->setMembre($notateur);
         $note->setFilm($film);
-        $note->setNote($array_request['note']);
+        if (isset($array_request['note'])){
+            $note->setNote($array_request['note']);
+        }
+        else {
+            $note->setNote(null);
+        }
 
         $em->persist($note);
         $em->flush();

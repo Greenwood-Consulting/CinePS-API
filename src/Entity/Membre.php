@@ -153,11 +153,15 @@ class Membre
         }
 
         $totalNotes = 0;
+        $nbNotes = 0;
         foreach ($notes as $note) {
-            $totalNotes += $note->getNote();
+            if ($note->getNote() !== null) {
+                $totalNotes += $note->getNote();
+                $nbNotes++;
+            }
         }
 
-        return $totalNotes / count($notes);
+        return $totalNotes / $nbNotes;
     }
 
     public function getNbNotes(EntityManagerInterface $entityManager): ?int

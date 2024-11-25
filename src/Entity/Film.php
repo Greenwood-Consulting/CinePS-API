@@ -133,9 +133,14 @@ class Film
 
         if ($count > 0) {
             foreach ($notes as $note) {
-                $total += $note->getNote();
+                $noteValue = $note->getNote();
+                if ($noteValue !== null) {
+                    $total += $noteValue;
+                } else {
+                    $count--;
+                }
             }
-            $this->moyenne = $total / $count;
+            $this->moyenne = $count > 0 ? $total / $count : null;
         } else {
             $this->moyenne = null;
         }
