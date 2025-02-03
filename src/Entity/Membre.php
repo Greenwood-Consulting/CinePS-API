@@ -169,7 +169,8 @@ class Membre
         $query = $entityManager->createQuery(
             'SELECT n
             FROM App\Entity\Note n
-            WHERE n.membre = :currentUser'
+            WHERE n.membre = :currentUser
+            AND n.note IS NOT NULL'
         )->setParameter('currentUser', $this->getId());
 
         $notes = $query->getResult();
