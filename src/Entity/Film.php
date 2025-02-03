@@ -136,7 +136,7 @@ class Film
                 $noteValue = $note->getNote();
                 if ($noteValue !== null) {
                     $total += $noteValue;
-                } else {
+                } else { // Si une note est null, alors cela correspond à une abstention, qui ne doit pas être prise en compte dans le calcul de la moyenne
                     $count--;
                 }
             }

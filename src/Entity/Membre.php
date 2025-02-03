@@ -170,7 +170,7 @@ class Membre
             'SELECT n
             FROM App\Entity\Note n
             WHERE n.membre = :currentUser
-            AND n.note IS NOT NULL'
+            AND n.note IS NOT NULL' // les notes à NULL correspondent à des abstentions et ne sont pas comptabilisées dans le compte du nombre de notes données par l'utilisateur
         )->setParameter('currentUser', $this->getId());
 
         $notes = $query->getResult();
