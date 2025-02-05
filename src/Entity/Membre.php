@@ -153,11 +153,15 @@ class Membre
         }
 
         $totalNotes = 0;
+        $nbNotes = 0;
         foreach ($notes as $note) {
-            $totalNotes += $note->getNote();
+            if ($note->getNote() !== null) {
+                $totalNotes += $note->getNote();
+                $nbNotes++;
+            }
         }
 
-        return $totalNotes / count($notes);
+        return $totalNotes / $nbNotes;
     }
 
     public function getNbNotes(EntityManagerInterface $entityManager): ?int
@@ -165,7 +169,8 @@ class Membre
         $query = $entityManager->createQuery(
             'SELECT n
             FROM App\Entity\Note n
-            WHERE n.membre = :currentUser'
+            WHERE n.membre = :currentUser
+            AND n.note IS NOT NULL' // les notes à NULL correspondent à des abstentions et ne sont pas comptabilisées dans le compte du nombre de notes données par l'utilisateur
         )->setParameter('currentUser', $this->getId());
 
         $notes = $query->getResult();

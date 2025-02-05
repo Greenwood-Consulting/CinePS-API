@@ -28,7 +28,12 @@ class NoteController extends AbstractController
         $note = new Note();
         $note->setMembre($notateur);
         $note->setFilm($film);
-        $note->setNote($array_request['note']);
+        if (isset($array_request['note'])){
+            $note->setNote($array_request['note']);
+        }
+        else { // si on fait un call à ce service sans note, alors cela correspond à une abstention, qui est représentée en base par une note à null
+            $note->setNote(null);
+        }
 
         $em->persist($note);
         $em->flush();

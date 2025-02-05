@@ -133,9 +133,14 @@ class Film
 
         if ($count > 0) {
             foreach ($notes as $note) {
-                $total += $note->getNote();
+                $noteValue = $note->getNote();
+                if ($noteValue !== null) {
+                    $total += $noteValue;
+                } else { // Si une note est null, alors cela correspond à une abstention, qui ne doit pas être prise en compte dans le calcul de la moyenne
+                    $count--;
+                }
             }
-            $this->moyenne = $total / $count;
+            $this->moyenne = $count > 0 ? $total / $count : null;
         } else {
             $this->moyenne = null;
         }
