@@ -1,0 +1,31 @@
+name: Upload to PROD AWS EC2 via SFTP
+
+on:
+  workflow_dispatch:  # Permet d'exécuter le workflow manuellement
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3  # Récupère ton dépôt
+
+    - name: Set up SSH key for LFTP
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.PROD_AWS_EC2_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.PROD_AWS_EC2_HOST_IP }} >> ~/.ssh/known_hosts
+
+    - name: Install lftp
+      run: sudo apt-get install -y lftp  # Installation de lftp, un outil SFTP/FTP
+
+    - name: Upload files via SFTP
+      run: |
+        lftp -f "
+        set sftp:connect-program 'ssh -a -x -i ~/.ssh/id_rsa'
+        open -u ${{ secrets.PROD_AWS_EC2_USER }}, sftp://${{ secrets.PROD_AWS_EC2_HOST_IP }}
+        mirror -R ./ /var/www/CinePS-API --exclude .git/ --exclude .htaccess --exclude env.php
+        bye
+        "
