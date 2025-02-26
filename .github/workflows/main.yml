@@ -1,4 +1,4 @@
-name: Upload via SFTP
+name: Upload to GANDI PREPROD via SFTP
 
 on:
   push:
