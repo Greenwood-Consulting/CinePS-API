@@ -72,9 +72,11 @@ class StatsController extends AbstractController
             'nbNotes' => $user->getNbNotes($entityManager),
             ];
         }
+        // On enlève les membres qui n'ont pas donné de note
         $usersNotesMoyennes = array_filter($usersNotesMoyennes, function ($userNote) {
             return $userNote['noteMoyenne'] !== null;
         });
+        // On fait un classement par ordre décroissant
         usort($usersNotesMoyennes, function ($a, $b) {
             return $a['noteMoyenne'] <=> $b['noteMoyenne'];
         });

@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SemaineController extends AbstractController
 {
-    // Retourne l'id base de données de la semaine en cours. 0 si la semaine en cours n'existe pas encore dans la base de données
+    // Retourne les datas de la semaine en cours
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
     public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
     {
@@ -56,6 +56,7 @@ class SemaineController extends AbstractController
         
     }
 
+    // Retourne la liste des proposeurs des prochaines semaines
     #[Route('/api/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
     public function nextProposeurs(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
