@@ -11,7 +11,13 @@ kernel:
 api_login_check:
     path: /api/login_check
 
-nelmio_api_doc:
+# ⚠️ Attention : certaines routes comme /api/doc.json ne fonctionnent pas
+# avec le serveur PHP intégré (php -S) si on n'utilise pas index.php comme router.
+# Utiliser cette commande pour lancer le serveur avec le bon routeur :
+# php -S localhost:8000 -t public public/index.php
+# Ou mieux encore, utiliser le serveur Symfony :
+# symfony serve
+nelmio_api_doc_json:
     path: /api/doc.json
     controller: Nelmio\ApiDocBundle\Controller\SwaggerUiController::apiDocumentation
     methods: [GET]
