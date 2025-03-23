@@ -10,3 +10,8 @@ kernel:
 
 api_login_check:
     path: /api/login_check
+
+nelmio_api_doc:
+    path: /api/doc.json
+    controller: Nelmio\ApiDocBundle\Controller\SwaggerUiController::apiDocumentation
+    methods: [GET]
