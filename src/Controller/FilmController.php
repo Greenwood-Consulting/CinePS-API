@@ -47,7 +47,7 @@ class FilmController extends AbstractController
     }
 
 
-    #[Route('/api/Allfilms', name: 'app_Allfilms')]
+    #[Route('/api/Allfilms', name: 'app_Allfilms', methods:['GET'])]
     public function getAllFilms(EntityManagerInterface $entityManager, FilmRepository $filmRepository, SerializerInterface $serializer): JsonResponse
     {
 

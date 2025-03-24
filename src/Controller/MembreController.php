@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class MembreController extends AbstractController
 {
-    #[Route('/api/membres', name: 'app_membre')]
+    #[Route('/api/membres', name: 'app_membre', methods: ['GET'])]
     public function getAllMembres(MembreRepository $membreRepository, SerializerInterface $serializer): JsonResponse
     {
 

@@ -17,7 +17,7 @@ class StatsController extends AbstractController
     // @TODO : merger tous ces endpoints en un seul endpoint car ils partent tous du proposeur en réalité
 
     //Récupère le nombre de proposeur 
-    #[Route('/api/getNbPropositionsParProposeur', name: 'app_get_nbproposeur')]
+    #[Route('/api/getNbPropositionsParProposeur', name: 'app_get_nbproposeur', methods: ['GET'])]
     public function getCountProposeurSemaine(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $queryBuilder_get_nb_propositions_par_proposeur = $entityManager->createQueryBuilder();
@@ -35,7 +35,7 @@ class StatsController extends AbstractController
         return new JsonResponse ($jsonResultatNbPropositionParProposeur, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/usersSatisfaction', name: 'app_users_satisfaction')]
+    #[Route('/api/usersSatisfaction', name: 'app_users_satisfaction', methods: ['GET'])]
     public function getUsersSatisfaction(EntityManagerInterface $entityManager, MembreRepository $membreRepository, SerializerInterface $serializer): JsonResponse
     {
         $users = $membreRepository->findAll();
@@ -58,7 +58,7 @@ class StatsController extends AbstractController
         return new JsonResponse($jsonUsersSatisfaction, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/usersNotesMoyennes', name: 'app_users_notes_moyennes')]
+    #[Route('/api/usersNotesMoyennes', name: 'app_users_notes_moyennes', methods: ['GET'])]
     public function getNotesMoyennesParMembre(EntityManagerInterface $entityManager, MembreRepository $membreRepository, SerializerInterface $serializer): JsonResponse
     {
         $users = $membreRepository->findAll();

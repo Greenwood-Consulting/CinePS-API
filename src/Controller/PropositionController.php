@@ -46,7 +46,7 @@ class PropositionController extends AbstractController
     }
 
 
-    #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante')]
+    #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante', methods: ['GET'])]
     public function getPropositionPerdante(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
