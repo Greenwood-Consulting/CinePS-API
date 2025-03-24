@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use DateTime;
 use App\Entity\Membre;
 use App\Entity\Semaine;
 use App\Repository\MembreRepository;
-use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,6 +19,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminController extends AbstractController
 {
+    #[OA\Post(
+        path: "/api/newmembre",
+        summary: "Créer un nouveau membre",
+        requestBody: new OA\RequestBody(
+            description: "Données du nouveau membre",
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: Membre::class, groups: ['postMembre'])
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Membre créé avec succès",
+                headers: [
+                    new OA\Header(
+                        header: "Location",
+                        description: "URL du membre créé",
+                        schema: new OA\Schema(type: "string", format: "uri")
+                    )
+                ],
+                content: new OA\JsonContent(
+                    ref: new Model(type: Membre::class, groups: ['getMembre'])
+                )
+            )
+        ]
+    )]
     #[Route('/api/newmembre', name:"createMembre", methods: ['POST'])]
     public function createMembre(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse 
     {

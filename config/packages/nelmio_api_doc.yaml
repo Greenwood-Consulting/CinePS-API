@@ -7,3 +7,5 @@ nelmio_api_doc:
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc) # Accepts routes under /api except /api/doc and /api/doc.json
+    models:
+        use_jms: false # désactive JMS pour forcer l'utilisation du Serializer Symfony (#[Groups])
