@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use DateTime;
 use App\Entity\Film;
 use App\Entity\Note;
@@ -22,6 +24,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SemaineController extends AbstractController
 {
+    
+    #[OA\Tag(name: 'Semaine')]
+    #[OA\Get(
+        path: '/api/currentSemaine',
+        summary: 'Get the current week data',
+        description: 'Returns the data of the current week based on the current date.',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful response with current week data',
+                content: new OA\JsonContent(ref: new Model(type: Semaine::class, groups: ['getPropositions']))
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not Found',
+                content: new OA\JsonContent(type: 'object', properties: [
+                    new OA\Property(property: 'error', type: 'string', example: 'Not Found')
+                ])
+            )
+        ]
+    )]
     // Retourne les datas de la semaine en cours
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
     public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
@@ -56,6 +79,35 @@ class SemaineController extends AbstractController
         
     }
 
+    #[OA\Tag(name: 'Semaine')]
+    #[OA\Get(
+        path: '/api/nextProposeurs/{id_semaine}',
+        summary: 'Get the list of proposers for upcoming weeks',
+        description: 'Returns the list of proposers for the weeks following the given week ID.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id_semaine',
+                in: 'path',
+                required: true,
+                description: 'The ID of the current week to fetch proposers for subsequent weeks',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful response with the list of proposers',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: new Model(type: Semaine::class, groups: ['getPropositions'])))
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not Found',
+                content: new OA\JsonContent(type: 'object', properties: [
+                    new OA\Property(property: 'error', type: 'string', example: 'Not Found')
+                ])
+            )
+        ]
+    )]
     // Retourne la liste des proposeurs des prochaines semaines
     #[Route('/api/nextProposeurs/{id_semaine}', name:'nextProposeurs', methods: ['GET'])]
     public function nextProposeurs(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
@@ -84,6 +136,35 @@ class SemaineController extends AbstractController
 
     }
 
+    #[OA\Tag(name: 'Semaine')]
+    #[OA\Get(
+        path: '/api/votes/{id_semaine}',
+        summary: 'Get votes and ratings for a specific week',
+        description: 'Returns the votes and ratings for all propositions of a specific week.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id_semaine',
+                in: 'path',
+                required: true,
+                description: 'The ID of the week to fetch votes and ratings for',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful response with votes and ratings',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: new Model(type: Semaine::class, groups: ['getPropositions'])))
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not Found',
+                content: new OA\JsonContent(type: 'object', properties: [
+                    new OA\Property(property: 'error', type: 'string', example: 'Not Found')
+                ])
+            )
+        ]
+    )]
     // Votes de la semaine
     #[Route('/api/votes/{id_semaine}', name:'votes', methods: ['GET'])]
     public function votes(int $id_semaine, MembreRepository $membreRepository, PropositionRepository $propositionRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
@@ -150,6 +231,53 @@ class SemaineController extends AbstractController
 
     }
 
+    #[OA\Tag(name: 'Semaine')]
+    #[OA\Patch(
+        path: '/api/semaine/{id_semaine}',
+        summary: 'Update a specific week',
+        description: 'Updates the details of a specific week, including propositions, theme, winning proposition, and other attributes.',
+        parameters: [
+            new OA\Parameter(
+                name: 'id_semaine',
+                in: 'path',
+                required: true,
+                description: 'The ID of the week to update',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'Data to update the week',
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'proposition_terminee', type: 'boolean', description: 'Indicates if the propositions are finished'),
+                    new OA\Property(property: 'theme', type: 'string', description: 'The theme of the week'),
+                    new OA\Property(property: 'proposition_gagnante', type: 'integer', description: 'ID of the winning proposition'),
+                    new OA\Property(property: 'proposeur_id', type: 'integer', description: 'ID of the proposer'),
+                    new OA\Property(property: 'raison_changement_film', type: 'string', description: 'Reason for changing the film'),
+                    new OA\Property(property: 'type_semaine', type: 'string', description: 'Type of the week (e.g., PSDroitDivin)'),
+                    new OA\Property(property: 'droit_divin_titre_film', type: 'string', description: 'Title of the film for PSDroitDivin'),
+                    new OA\Property(property: 'droit_divin_date_film', type: 'string', format: 'date', description: 'Release date of the film for PSDroitDivin'),
+                    new OA\Property(property: 'droit_divin_lien_imdb', type: 'string', description: 'IMDB link of the film for PSDroitDivin')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful response with updated week data',
+                content: new OA\JsonContent(ref: new Model(type: Semaine::class, groups: ['getPropositions']))
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not Found',
+                content: new OA\JsonContent(type: 'object', properties: [
+                    new OA\Property(property: 'error', type: 'string', example: 'Not Found')
+                ])
+            )
+        ]
+    )]
     // Met à jour une semaine
     #[Route('/api/semaine/{id_semaine}', name: 'updateSemaine', methods: ['PATCH'])]
     public function createProposition($id_semaine, Request $request, SemaineRepository $semaineRepository, FilmRepository $filmRepository, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse

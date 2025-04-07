@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminController extends AbstractController
 {
+    #[OA\Tag(name: 'Admin')]
     #[OA\Post(
         path: "/api/newmembre",
         summary: "Créer un nouveau membre",
@@ -60,6 +61,39 @@ class AdminController extends AbstractController
         return new JsonResponse($jsonMembre, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
+    #[OA\Tag(name: 'Admin')]
+    #[OA\Post(
+        path: "/api/newSemaine",
+        summary: "Créer une nouvelle semaine",
+        requestBody: new OA\RequestBody(
+            description: "Données de la nouvelle semaine",
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "proposeur_id", type: "integer", description: "ID du proposeur"),
+                    new OA\Property(property: "jour", type: "string", format: "date", description: "Jour de la semaine (format Y-m-d)"),
+                    new OA\Property(property: "type_semaine", type: "string", description: "Type de la semaine")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Semaine créée avec succès",
+                headers: [
+                    new OA\Header(
+                        header: "Location",
+                        description: "URL de la semaine créée",
+                        schema: new OA\Schema(type: "string", format: "uri")
+                    )
+                ],
+                content: new OA\JsonContent(
+                    ref: new Model(type: Semaine::class, groups: ['getPropositions'])
+                )
+            )
+        ]
+    )]
     #[Route('/api/newSemaine', name:"createSemaine", methods: ['POST'])]
     public function createSemaine(Request $request, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse 
     {
