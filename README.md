@@ -50,6 +50,12 @@ Tu peux l’ouvrir dans Swagger UI (en ligne ou localement) sans lancer le proje
 Swagger UI en ligne :  
 🔗 [https://editor.swagger.io/](https://editor.swagger.io/)
 
+### 3. Commande pour générer le fichier openapi.json
+
+```bash
+php bin/console nelmio:api:dump --format=json > openapi.json
+```
+
 ## 📂 Structure du projet
 
 ```text
