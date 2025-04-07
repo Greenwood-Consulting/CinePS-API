@@ -19,12 +19,12 @@ class Membre
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getPropositions", "filmsGagnants"])]
-    private ?string $Nom = null;
+    #[Groups(["getPropositions", "filmsGagnants", "postMembre"])]
+    private ?string $nom = null;
 
-    #[Groups(["getPropositions"])]
+    #[Groups(["getPropositions", "postMembre"])]
     #[ORM\Column(length: 255)]
-    private ?string $Prenom = null;
+    private ?string $prenom = null;
 
     #[ORM\Column(length: 255)]
     private ?string $mail = null;
@@ -45,24 +45,24 @@ class Membre
 
     public function getNom(): ?string
     {
-        return $this->Nom;
+        return $this->nom;
     }
 
-    public function setNom(string $Nom): self
+    public function setNom(string $nom): self
     {
-        $this->Nom = $Nom;
+        $this->nom = $nom;
 
         return $this;
     }
 
     public function getPrenom(): ?string
     {
-        return $this->Prenom;
+        return $this->prenom;
     }
 
-    public function setPrenom(string $Prenom): self
+    public function setPrenom(string $prenom): self
     {
-        $this->Prenom = $Prenom;
+        $this->prenom = $prenom;
 
         return $this;
     }

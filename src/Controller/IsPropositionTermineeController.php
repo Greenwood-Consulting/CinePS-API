@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
 use App\Entity\AVote;
 use App\Entity\Membre;
 use App\Entity\Semaine;
+use OpenApi\Annotations\Parameter;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,8 +18,35 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IsPropositionTermineeController extends AbstractController
 {
 
+    #[OA\Get(
+        path: "/api/isVoteTermine/{id_semaine}",
+        summary: "Vérifie si le vote pour une semaine est terminé",
+        parameters: [
+            new OA\Parameter(
+            name: "id_semaine",
+            in: "path",
+            required: true,
+            description: "ID de la semaine",
+            schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Indique si le vote est terminé",
+                content: new OA\JsonContent(
+                    type: "boolean",
+                    example: true
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Semaine non trouvée"
+            )
+        ]
+    )]
     //Indique si le vote pour la semaine $id_semaine est terminée
-    #[Route('/api/isVoteTermine/{id_semaine}', name: 'is_vote_termine')]
+    #[Route('/api/isVoteTermine/{id_semaine}', name: 'is_vote_termine', methods: ['GET'])]
     public function isVoteTermineCetteSemaine(int $id_semaine, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         ///Récupère le nombre de votants de la semaine $id_semaine

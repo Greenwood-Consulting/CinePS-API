@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use App\Entity\Note;
 use App\Repository\FilmRepository;
 use App\Repository\MembreRepository;
@@ -17,6 +19,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class NoteController extends AbstractController
 {
+    #[OA\Tag(name: 'Note')]
+    #[OA\Post(
+        path: '/api/note',
+        summary: 'Créer une nouvelle note',
+        description: 'Permet de créer une nouvelle note pour un film par un membre. Si aucune note n\'est fournie, cela correspond à une abstention.',
+        requestBody: new OA\RequestBody(
+            description: 'Données nécessaires pour créer une note',
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'membre_id', type: 'integer', description: 'ID du membre notateur'),
+                    new OA\Property(property: 'film_id', type: 'integer', description: 'ID du film à noter'),
+                    new OA\Property(property: 'note', type: 'integer', nullable: true, description: 'Note attribuée au film (optionnelle)')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Note créée avec succès',
+                content: new OA\JsonContent(ref: new Model(type: Note::class, groups: ['getNotes']))
+            ),
+            new OA\Response(response: 400, description: 'Requête invalide'),
+            new OA\Response(response: 404, description: 'Membre ou film introuvable')
+        ]
+    )]
     // Crée une nouvelle note
     #[Route('/api/note', name: 'createNote', methods: ['POST'])]
     public function createNote(Request $request, MembreRepository $membreRepository, FilmRepository $filmRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse

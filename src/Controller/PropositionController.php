@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenAI;
 use DateTime;
 use App\Entity\Film;
@@ -20,6 +22,29 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PropositionController extends AbstractController
 {
 
+    #[OA\Tag(name: "Proposition")]
+    #[OA\Post(
+        path: "/api/proposition",
+        summary: "Créer une nouvelle proposition et le film associé",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "titre_film", type: "string", description: "Titre du film"),
+                    new OA\Property(property: "sortie_film", type: "string", description: "Année de sortie du film"),
+                    new OA\Property(property: "imdb_film", type: "string", description: "Lien IMDb du film")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Proposition créée avec succès",
+                content: new OA\JsonContent(type: "object")
+            )
+        ]
+    )]
     // Crée une nouvelle proposition et le film associé
     #[Route('/api/proposition', name: 'createProposition', methods: ['POST'])]
     public function createProposition(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
@@ -45,8 +70,28 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_CREATED, [], true);
     }
 
-
-    #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante')]
+    #[OA\Tag(name: "Proposition")]
+    #[OA\Get(
+        path: "/api/PropositionPerdante/{proposeur_id}",
+        summary: "Récupérer les propositions perdantes pour un proposeur donné",
+        parameters: [
+            new OA\Parameter(
+                name: "proposeur_id",
+                in: "path",
+                required: true,
+                description: "ID du proposeur",
+                schema: new OA\Schema(type: "integer")
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Liste des propositions perdantes",
+                content: new OA\JsonContent(type: "array", items: new OA\Items(ref: new Model(type: Proposition::class, groups: ["getPropositions"])))
+            )
+        ]
+    )]
+    #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante', methods: ['GET'])]
     public function getPropositionPerdante(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
@@ -134,6 +179,29 @@ class PropositionController extends AbstractController
         return new JsonResponse($jsonProposition, Response::HTTP_OK, [], true);
     }
 
+    #[OA\Tag(name: "Proposition")]
+    #[OA\Post(
+        path: "/api/propositionOpenAI",
+        summary: "Créer des propositions de films basées sur un thème en utilisant OpenAI",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "theme", type: "string", description: "Thème pour générer des propositions de films")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: "Films et propositions enregistrés avec succès",
+                content: new OA\JsonContent(type: "object", properties: [
+                    new OA\Property(property: "message", type: "string", example: "Les films et propositions ont été enregistrés en base de données")
+                ])
+            )
+        ]
+    )]
     #[Route('/api/propositionOpenAI', name: 'createPropositionApi', methods: ['POST'])]
     public function createPropositionOpenAI(Request $request, CurrentSemaine $currentSemaineService, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
     {

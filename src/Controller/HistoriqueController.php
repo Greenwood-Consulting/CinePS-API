@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
 use App\Entity\Note;
 use App\Entity\Vote;
 use App\Entity\Semaine;
@@ -19,6 +20,85 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HistoriqueController extends AbstractController
 {
+
+    #[OA\Tag(name: 'Historique')]
+    #[OA\Get(
+        path: '/api/historique',
+        summary: 'Retrieve the history of past weeks with propositions, votes, and notes',
+        description: 'This endpoint provides the historical data of past weeks, including propositions, votes, and notes for each member, along with the victorious film for each week.',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful response with historical data',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'semaines',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer'),
+                                    new OA\Property(property: 'jour', type: 'string', format: 'date'),
+                                    new OA\Property(
+                                        property: 'propositions',
+                                        type: 'array',
+                                        items: new OA\Items(
+                                            type: 'object',
+                                            properties: [
+                                                new OA\Property(property: 'id', type: 'integer'),
+                                                new OA\Property(property: 'film', type: 'object'),
+                                                new OA\Property(
+                                                    property: 'vote',
+                                                    type: 'array',
+                                                    items: new OA\Items(
+                                                        type: 'object',
+                                                        properties: [
+                                                            new OA\Property(property: 'membre', type: 'string'),
+                                                            new OA\Property(property: 'vote', type: 'string')
+                                                        ]
+                                                    )
+                                                ),
+                                                new OA\Property(
+                                                    property: 'note',
+                                                    type: 'array',
+                                                    items: new OA\Items(
+                                                        type: 'object',
+                                                        properties: [
+                                                            new OA\Property(property: 'membre', type: 'integer'),
+                                                            new OA\Property(property: 'note', type: 'string')
+                                                        ]
+                                                    )
+                                                )
+                                            ]
+                                        )
+                                    ),
+                                    new OA\Property(property: 'film_victorieux', type: 'object')
+                                ]
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'membres',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer'),
+                                    new OA\Property(property: 'Prenom', type: 'string'),
+                                    new OA\Property(property: 'Nom', type: 'string')
+                                ]
+                            )
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Not Found'
+            )
+        ]
+    )]
     #[Route('/api/historique', name: 'app_historique', methods: ['GET'])]
     public function historique(FilmVictorieux $filmVictorieux, PropositionRepository $propositionRepository, SemaineRepository $semaineRepository, MembreRepository $membreRepository, CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
     {

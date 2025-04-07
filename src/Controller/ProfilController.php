@@ -8,10 +8,26 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use OpenApi\Attributes as OA;
 
 class ProfilController extends AbstractController
 {
-    
+    #[OA\Tag(name: 'Profil')]
+    #[OA\Get(
+        path: '/api/filmsGagnants',
+        summary: 'Retrieve all winning films from past weeks',
+        tags: ['Profil'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'List of winning films',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(ref: '#/components/schemas/Film')
+                )
+            )
+        ]
+    )]
     // Récupère tous les films gagnants de toutes les semaines passées
     #[Route('/api/filmsGagnants', name:'filmsGagants', methods: ['GET'])]
     public function filmsGagnants(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
