@@ -152,9 +152,9 @@ class HistoriqueController extends AbstractController
                     $arrayVote = json_decode($jsonResultatVote, true);
 
                     if (empty($arrayVote)){
-                        $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => '');
+                        $proposition_votes[] = array("membre" => $membre['prenom'], "vote" => '');
                     } else {
-                        $proposition_votes[] = array("membre" => $membre['Prenom'], "vote" => $arrayVote[0]['vote']);
+                        $proposition_votes[] = array("membre" => $membre['prenom'], "vote" => $arrayVote[0]['vote']);
                     }
 
                     // Récupérer la note de l'utilisateur pour ce film
