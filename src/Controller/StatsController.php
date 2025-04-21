@@ -45,7 +45,7 @@ class StatsController extends AbstractController
     public function getCountProposeurSemaine(EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $queryBuilder_get_nb_propositions_par_proposeur = $entityManager->createQueryBuilder();
-        $queryBuilder_get_nb_propositions_par_proposeur->select('p.Nom AS proposeur','COUNT(s.id) AS nb_semaines')
+        $queryBuilder_get_nb_propositions_par_proposeur->select('p.nom AS proposeur','COUNT(s.id) AS nb_semaines')
         ->from(Semaine::class, 's')
         ->where("s.type != 'PSSansFilm' ")
         ->andWhere("s.type != 'PasDePS' ")
