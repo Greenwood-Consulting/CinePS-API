@@ -26,6 +26,6 @@ jobs:
         lftp -f "
         set sftp:connect-program 'ssh -a -x -i ~/.ssh/id_rsa'
         open -u ${{ secrets.PROD_AWS_EC2_USER }}, sftp://${{ secrets.PROD_AWS_EC2_HOST_IP }}
-        mirror -R ./ /var/www/CinePS-API --exclude .git/ --exclude .htaccess --exclude env.php
+        mirror -R ./ /var/www/CinePS-API --exclude .git/ --exclude .htaccess --exclude .env --exclude config/
         bye
         "
