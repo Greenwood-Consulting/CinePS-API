@@ -1,5 +1,5 @@
 <?php 
-$apiKey = getenv('OPENAI_KEY');
+$apiKey = getenv('OPENAI_API_KEY');
 $ghKey = getenv('GITHUB_TOKEN');
 
 function call_API_POST_ChatGPT($json_body, $apiKey){
