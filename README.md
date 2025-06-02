@@ -92,14 +92,14 @@ npx @redocly/cli build-docs doc/openapi.json -o doc/redoc.html
 
 À compléter
 
-## Convention de nommage des branches
+## 🌿 Convention de nommage des branches
 
-feature/..
-fix/..
-refacto/..
-tests/..
+feature/..  
+fix/..  
+refacto/..  
+tests/..  
 
-## tests automatisés
+## 🤖 Tests automatisés
 
 package requis:
 
