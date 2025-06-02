@@ -91,3 +91,20 @@ npx @redocly/cli build-docs doc/openapi.json -o doc/redoc.html
 ## 📄 Licence
 
 À compléter
+
+## Convention de nommage des branches
+
+feature/..
+fix/..
+refacto/..
+tests/..
+
+## tests automatisés
+
+package requis:
+
+    composer require --dev symfony/test-pack
+
+lancer les tests:
+
+    php bin/phpunit
