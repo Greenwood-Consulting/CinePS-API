@@ -60,6 +60,6 @@ class IndexConnexionTest extends TestCase
         $this->assertArrayHasKey('id', $data, 'Response should have an id');
     }
 
-    // @TODO: ajouter la déconnexion
+    // @TODO: ajouter le test de GET /api/filmsGagnants
 
 }
