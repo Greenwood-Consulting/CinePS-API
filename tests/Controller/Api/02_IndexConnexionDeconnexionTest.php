@@ -49,7 +49,7 @@ class IndexConnexionTest extends TestCase
 
     private function callOneMembre(): void
     {
-        $response = $this->client->request('GET', $_ENV['API_BASE_URL'].'/api/membre/1', [
+        $response = $this->client->request('GET', $_ENV['API_BASE_URL'].'/api/membres/1', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token,
             ],
