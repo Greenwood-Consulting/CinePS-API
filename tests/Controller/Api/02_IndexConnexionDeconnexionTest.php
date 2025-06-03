@@ -26,6 +26,7 @@ class IndexConnexionTest extends TestCase
     {
         $this->authenticate();
         $this->callOneMembre();
+        $this->callFilmsGagnants();
     }
 
     private function authenticate(): void
@@ -60,6 +61,17 @@ class IndexConnexionTest extends TestCase
         $this->assertArrayHasKey('id', $data, 'Response should have an id');
     }
 
-    // @TODO: ajouter le test de GET /api/filmsGagnants
+    private function callFilmsGagnants(): void
+    {
+        $response = $this->client->request('GET', $_ENV['API_BASE_URL'].'/api/filmsGagnants', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token,
+            ],
+        ]);
+        $this->assertSame(200, $response->getStatusCode(), 'GET /api/filmsGagnants should return 200');
+        $data = $response->toArray();
+        $this->assertIsArray($data, 'Response should be an array');
+        $this->assertNotEmpty($data, 'Response should be an array not empty');
+    }
 
 }
