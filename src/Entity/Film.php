@@ -50,6 +50,9 @@ class Film
     #[Groups(["filmsGagnants"])]
     private ?float $moyenne = null;
 
+    #[Groups(["filmsGagnants"])]
+    private ?float $ecartType = null;
+
     public function __construct()
     {
         $this->propositions = new ArrayCollection();
@@ -145,6 +148,28 @@ class Film
             $this->moyenne = null;
         }
         return $this->moyenne;
+    }
+
+    public function getEcartType(): ?float
+    {
+        // Extraction des noms
+        $notes = array_map(fn($n) => $n->getNote(), $this->getNotes()->toArray());
+        // suppression des null
+        $notes = array_filter($notes, fn($n) => !is_null($n));
+
+        // Exiger au moins 5 notes pour faire ce calcul
+        $notesCount = count($notes);
+        if($notesCount <5) {
+            return null;
+        }
+            
+        $moyenne = $this->getMoyenne();
+        $sommeCarres = 0.0;
+        foreach ($notes as $note) {
+            $sommeCarres += pow($note - $moyenne, 2);
+        }
+
+        return round(sqrt($sommeCarres / $notesCount), 1);
     }
 
 }
