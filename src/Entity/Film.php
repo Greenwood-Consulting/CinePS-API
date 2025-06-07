@@ -152,18 +152,22 @@ class Film
 
     public function getEcartType(): ?float
     {
-        // Extraction des noms
+        // Extraction des notes
         $notes = array_map(fn($n) => $n->getNote(), $this->getNotes()->toArray());
-        // suppression des null
+        // Filtrage des null: Si une note est null, alors cela correspond à une abstention, qui ne doit pas être prise en compte dans le calcul de la moyenne
         $notes = array_filter($notes, fn($n) => !is_null($n));
 
-        // Exiger au moins 5 notes pour faire ce calcul
+        // Exiger au moins 2 notes pour faire ce calcul
         $notesCount = count($notes);
-        if($notesCount <5) {
+        if($notesCount < 2) {
             return null;
         }
             
         $moyenne = $this->getMoyenne();
+        if(is_null($moyenne)) {
+            return null;
+        }
+
         $sommeCarres = 0.0;
         foreach ($notes as $note) {
             $sommeCarres += pow($note - $moyenne, 2);
