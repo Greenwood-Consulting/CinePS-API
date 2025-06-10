@@ -53,7 +53,7 @@ Swagger UI en ligne :
 ### 3. Commande pour générer le fichier openapi.json
 
 ```bash
-php bin/console nelmio:api:dump --format=json > doc/openapi.json
+php bin/console nelmio:api:dump --format=json > docs/openapi.json
 ```
 
 ### 4. Commande utilisée pour générer le fichier redoc
