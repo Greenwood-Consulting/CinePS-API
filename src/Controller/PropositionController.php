@@ -71,6 +71,50 @@ class PropositionController extends AbstractController
     }
 
     #[OA\Tag(name: "Proposition")]
+    #[OA\Delete(
+        path: '/api/proposition/{proposition_id}',
+        summary: 'Supprime une proposition',
+        description: 'Supprime une proposition existante à partir de son ID',
+        tags: ['Proposition']
+    )]
+    #[OA\Parameter(
+        name: 'proposition_id',
+        in: 'path',
+        required: true,
+        description: 'ID de la proposition à supprimer',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'Suppression réussie, aucun contenu retourné'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Proposition non trouvée',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', type: 'string', example: 'Proposition not found')
+            ],
+            type: 'object'
+        )
+    )]
+    // Supprime une proposition et le film associé
+    #[Route('/api/proposition/{proposition_id}', name: 'deleteProposition', methods: ['DELETE'])]
+    public function deleteProposition(int $proposition_id, EntityManagerInterface $em): JsonResponse {
+        $repository = $em->getRepository(Proposition::class);
+        $proposition = $repository->find($proposition_id);
+
+        if (!$proposition) {
+            return new JsonResponse(['error' => 'Proposition not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($proposition);
+        $em->flush();
+
+        return new JsonResponse(['success' => true], Response::HTTP_NO_CONTENT);
+    }
+
+    #[OA\Tag(name: "Proposition")]
     #[OA\Get(
         path: "/api/PropositionPerdante/{proposeur_id}",
         summary: "Récupérer les propositions perdantes pour un proposeur donné",
