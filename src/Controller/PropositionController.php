@@ -136,7 +136,7 @@ class PropositionController extends AbstractController
     }
 
     #[OA\Post(
-        path: "/api/seconde-chance/{proposeur_id}",
+        path: "/api/secondeChance/{proposeur_id}",
         summary: "Récupérer les propositions perdantes pour un proposeur donné",
         parameters: [
             new OA\Parameter(
@@ -155,7 +155,7 @@ class PropositionController extends AbstractController
             )
         ]
     )]
-    #[Route('/api/seconde-chance/{proposeur_id}', name: 'proposition_perdante', methods: ['POST'])]
+    #[Route('/api/secondeChance/{proposeur_id}', name: 'proposition_perdante', methods: ['POST'])]
     public function getSecondeChance(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
