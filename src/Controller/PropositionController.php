@@ -135,9 +135,8 @@ class PropositionController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[OA\Tag(name: "Proposition")]
-    #[OA\Get(
-        path: "/api/PropositionPerdante/{proposeur_id}",
+    #[OA\Post(
+        path: "/api/seconde-chance/{proposeur_id}",
         summary: "Récupérer les propositions perdantes pour un proposeur donné",
         parameters: [
             new OA\Parameter(
@@ -156,8 +155,8 @@ class PropositionController extends AbstractController
             )
         ]
     )]
-    #[Route('/api/PropositionPerdante/{proposeur_id}', name: 'proposition_perdante', methods: ['GET'])]
-    public function getPropositionPerdante(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
+    #[Route('/api/seconde-chance/{proposeur_id}', name: 'proposition_perdante', methods: ['POST'])]
+    public function getSecondeChance(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
 
