@@ -100,7 +100,28 @@ class PropositionController extends AbstractController
     )]
     // Supprime une proposition et le film associé
     #[Route('/api/proposition/{proposition_id}', name: 'deleteProposition', methods: ['DELETE'])]
-    public function deleteProposition(int $proposition_id, EntityManagerInterface $em): JsonResponse {
+    public function deleteProposition(int $proposition_id, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse {
+
+        // On ne peut faire un delete de proposition que d'une proposition de la currentSemaine
+        $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
+        if (!isset($semaine_courante)) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, no current semaine'], Response::HTTP_CONFLICT);
+        }
+
+        $current_sem_prop_ids = array_map(fn($n) => $n->getId(), $semaine_courante->getPropositions()->toArray());
+        if(!in_array($proposition_id, $current_sem_prop_ids)) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, not in current semaine'], Response::HTTP_CONFLICT);
+        }
+
+        // On ne peut delete une proposition de la currentSemaine que si les propositions ne sont pas terminées
+        if($semaine_courante->isPropositionTermine()) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, propositions finished'], Response::HTTP_CONFLICT);
+        }
+
+        // @TODO: Seul l'utilisateur qui a proposé la proposition peut delete la proposition (je sais pas exactement comment le vérifier, à réfléchir)
+        // => il faut que l'api connaisse l'identité du membre (via le token jwt)
+        // donc fusionner les tables membre et user
+
         $repository = $em->getRepository(Proposition::class);
         $proposition = $repository->find($proposition_id);
 
