@@ -68,7 +68,7 @@ class SemaineController extends AbstractController
         }
 
         //Récupère la propositionTerminé de id_semaine
-        $currentSemaine = $semaineRepository->findByJour($friday_current_semaine);
+        $currentSemaine = $semaineRepository->findOneByJour($friday_current_semaine);
 
         if($currentSemaine) {
             $jsonFilmProposes = $serializer->serialize($currentSemaine, 'json', ['groups' => 'getPropositions']);
