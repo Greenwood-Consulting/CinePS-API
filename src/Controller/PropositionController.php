@@ -102,6 +102,13 @@ class PropositionController extends AbstractController
     #[Route('/api/proposition/{proposition_id}', name: 'deleteProposition', methods: ['DELETE'])]
     public function deleteProposition(int $proposition_id, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse {
 
+        $repository = $em->getRepository(Proposition::class);
+        $proposition = $repository->find($proposition_id);
+
+        if (!$proposition) {
+            return new JsonResponse(['error' => 'Proposition not found'], Response::HTTP_NOT_FOUND);
+        }
+
         // On ne peut faire un delete de proposition que d'une proposition de la currentSemaine
         $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
         if (!isset($semaine_courante)) {
@@ -122,17 +129,10 @@ class PropositionController extends AbstractController
         // => il faut que l'api connaisse l'identité du membre (via le token jwt)
         // donc fusionner les tables membre et user
 
-        $repository = $em->getRepository(Proposition::class);
-        $proposition = $repository->find($proposition_id);
-
-        if (!$proposition) {
-            return new JsonResponse(['error' => 'Proposition not found'], Response::HTTP_NOT_FOUND);
-        }
-
         $em->remove($proposition);
         $em->flush();
 
-        return new JsonResponse(['success' => true], Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     #[OA\Tag(name: "Proposition")]

@@ -45,7 +45,7 @@ class CurrentSemaine
         return 0;
     }
 
-    public function getCurrentSemaine(SemaineRepository $semaineRepository): Semaine
+    public function getCurrentSemaine(SemaineRepository $semaineRepository): ?Semaine
     {
         return $semaineRepository->findOneByJour(date_create($this->getFridayCurrentSemaine()));
     }
