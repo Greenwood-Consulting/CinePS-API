@@ -71,6 +71,71 @@ class PropositionController extends AbstractController
     }
 
     #[OA\Tag(name: "Proposition")]
+    #[OA\Delete(
+        path: '/api/proposition/{proposition_id}',
+        summary: 'Supprime une proposition',
+        description: 'Supprime une proposition existante à partir de son ID',
+        tags: ['Proposition']
+    )]
+    #[OA\Parameter(
+        name: 'proposition_id',
+        in: 'path',
+        required: true,
+        description: 'ID de la proposition à supprimer',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'Suppression réussie, aucun contenu retourné'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Proposition non trouvée',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', type: 'string', example: 'Proposition not found')
+            ],
+            type: 'object'
+        )
+    )]
+    // Supprime une proposition et le film associé
+    #[Route('/api/proposition/{proposition_id}', name: 'deleteProposition', methods: ['DELETE'])]
+    public function deleteProposition(int $proposition_id, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse {
+
+        $repository = $em->getRepository(Proposition::class);
+        $proposition = $repository->find($proposition_id);
+
+        if (!$proposition) {
+            return new JsonResponse(['error' => 'Proposition not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // On ne peut faire un delete de proposition que d'une proposition de la currentSemaine
+        $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
+        if (!isset($semaine_courante)) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, no current semaine'], Response::HTTP_CONFLICT);
+        }
+
+        $current_sem_prop_ids = array_map(fn($n) => $n->getId(), $semaine_courante->getPropositions()->toArray());
+        if(!in_array($proposition_id, $current_sem_prop_ids)) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, not in current semaine'], Response::HTTP_CONFLICT);
+        }
+
+        // On ne peut delete une proposition de la currentSemaine que si les propositions ne sont pas terminées
+        if($semaine_courante->isPropositionTermine()) {
+            return new JsonResponse(['error' => 'Cannot delete proposition, propositions finished'], Response::HTTP_CONFLICT);
+        }
+
+        // @TODO: Seul l'utilisateur qui a proposé la proposition peut delete la proposition (je sais pas exactement comment le vérifier, à réfléchir)
+        // => il faut que l'api connaisse l'identité du membre (via le token jwt)
+        // donc fusionner les tables membre et user
+
+        $em->remove($proposition);
+        $em->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[OA\Tag(name: "Proposition")]
     #[OA\Get(
         path: "/api/PropositionPerdante/{proposeur_id}",
         summary: "Récupérer les propositions perdantes pour un proposeur donné",
