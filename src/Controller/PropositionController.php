@@ -135,6 +135,7 @@ class PropositionController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
+    #[OA\Tag(name: "Proposition")]
     #[OA\Post(
         path: "/api/secondeChance/{proposeur_id}",
         summary: "Récupérer les propositions perdantes pour un proposeur donné",
