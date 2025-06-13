@@ -591,13 +591,13 @@
                 }
             }
         },
-        "/api/PropositionPerdante/{proposeur_id}": {
-            "get": {
+        "/api/secondeChance/{proposeur_id}": {
+            "post": {
                 "tags": [
                     "Proposition"
                 ],
                 "summary": "R\u00e9cup\u00e9rer les propositions perdantes pour un proposeur donn\u00e9",
-                "operationId": "get_proposition_perdante",
+                "operationId": "post_seconde_chance",
                 "parameters": [
                     {
                         "name": "proposeur_id",
