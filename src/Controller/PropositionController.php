@@ -156,7 +156,7 @@ class PropositionController extends AbstractController
             )
         ]
     )]
-    #[Route('/api/secondeChance/{proposeur_id}', name: 'proposition_perdante', methods: ['POST'])]
+    #[Route('/api/secondeChance/{proposeur_id}', name: 'seconde_chance', methods: ['POST'])]
     public function getSecondeChance(CurrentSemaine $currentSemaine, $proposeur_id, SemaineRepository $semaineRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer): JsonResponse
     {
         $proposition_perdante = [];
