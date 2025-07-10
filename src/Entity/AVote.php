@@ -12,6 +12,7 @@ class AVote
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["avote:read"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'no')]
