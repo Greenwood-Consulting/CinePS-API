@@ -97,7 +97,7 @@ class VoteController extends AbstractController
         $em->persist($avote);
         $em->flush();
 
-        $jsonAVote = $serializer->serialize($avote, 'json');
+        $jsonAVote = $serializer->serialize($avote, 'json', ['groups' => 'avote:read']);
         return new JsonResponse($jsonAVote, Response::HTTP_CREATED, [], true);
    }
 
