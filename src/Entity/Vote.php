@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\VoteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
 class Vote
@@ -11,6 +12,7 @@ class Vote
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["vote:read"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne]
