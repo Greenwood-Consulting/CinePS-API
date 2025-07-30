@@ -1,0 +1,67 @@
+classDiagram
+
+class Membre {
+  int id
+  string nom
+  string prenom
+  string mail
+  string mdp
+  bool actif
+}
+
+class Film {
+  int id
+  string titre
+  date date
+  int sortie_film
+  string imdb
+}
+
+class Semaine {
+  int id
+  date jour
+  bool proposition_termine
+  string theme
+  string type
+  string raison_proposition_choisie
+}
+
+class Proposition {
+  int id
+  int score
+}
+
+class Vote {
+  int id
+  int vote
+}
+
+class Note {
+  int id
+  int note
+}
+
+class Avote {
+  int id
+}
+
+class User {
+  int id
+  string email
+  json roles
+  string password
+}
+
+%% Relations
+
+Membre "1" --> "0..*" Semaine : propose
+Film "1" --> "0..1" Semaine : est_film_vu
+Membre "1" --> "0..*" Avote : a_voté
+Semaine "1" --> "0..*" Avote : semaine
+Semaine "1" --> "0..*" Vote : a_vote
+Membre "1" --> "0..*" Vote : vote
+Proposition "1" --> "0..*" Vote : reçoit_vote
+Semaine "1" --> "0..*" Proposition : contient
+Film "1" --> "0..*" Proposition : est_proposé
+Membre "1" --> "0..*" Note : a_noté
+Film "1" --> "0..*" Note : est_noté
