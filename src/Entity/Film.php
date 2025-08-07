@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
 class Film
@@ -18,25 +19,29 @@ class Film
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getPropositions", "filmsGagnants"])]
+    #[Groups(['film:read', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre du film est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le titre doit faire au moins {{ limit }} caractères", maxMessage: "Le titre ne peut pas faire plus de {{ limit }} caractères")]
-    #[Groups(["getPropositions", "filmsGagnants"])]
+    #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?string $titre = null;
 
+    // TODO: cohérence nullable
+    // TODO: incohérence  DateTime / Date
+    // actuellement ce champ est non-nullable en base, mais le validateur symfony accepte null
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["getPropositions", "filmsGagnants"])]
+    #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
-    #[Groups(["getPropositions", "filmsGagnants"])]
-    private ?int $sortie_film = null;
+    #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
+    #[SerializedName('sortie_film')]
+    private ?int $sortieFilm = null;
 
     #[ORM\Column(length: 600)]
-    #[Groups(["getPropositions", "filmsGagnants"])]
+    #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?string $imdb = null;
 
     #[ORM\OneToMany(mappedBy: 'film', targetEntity: Proposition::class)]
@@ -53,10 +58,15 @@ class Film
     #[Groups(["filmsGagnants"])]
     private ?float $ecartType = null;
 
+    #[ORM\ManyToMany(targetEntity: PreSelection::class, inversedBy: "films")]
+    #[ORM\JoinTable(name: "pre_selection_film")]
+    private Collection $preSelections;
+
     public function __construct()
     {
         $this->propositions = new ArrayCollection();
         $this->notes = new ArrayCollection();
+        $this->preSelections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,12 +100,12 @@ class Film
 
     public function getSortieFilm(): ?int
     {
-        return $this->sortie_film;
+        return $this->sortieFilm;
     }
 
-    public function setSortieFilm(int $sortie_film): self
+    public function setSortieFilm(int $sortieFilm): self
     {
-        $this->sortie_film = $sortie_film;
+        $this->sortieFilm = $sortieFilm;
 
         return $this;
     }
@@ -108,6 +118,26 @@ class Film
     public function setImdb(string $imdb): self
     {
         $this->imdb = $imdb;
+
+        return $this;
+    }
+
+    public function addPreSelection(PreSelection $preSelection): self
+    {
+        if (!$this->preSelections->contains($preSelection)) {
+            $this->preSelections->add($preSelection);
+            // maintient la relation bidirectionnelle
+            $preSelection->addFilm($this); 
+        }
+
+        return $this;
+    }
+
+    public function removePreSelection(PreSelection $preSelection): self
+    {
+        if ($this->preSelections->removeElement($preSelection)) {
+            $preSelection->removeFilm($this);
+        }
 
         return $this;
     }
