@@ -15,7 +15,7 @@ class AVote
     #[Groups(["avote:read"])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'no')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getPropositions"])]
     private ?Membre $votant = null;
