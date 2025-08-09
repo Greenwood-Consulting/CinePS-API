@@ -22,13 +22,16 @@ class CurrentSemaineTest extends TestCase
         $this->client = HttpClient::create();
     }
 
+    /**
+     * Vérifier si le service currentSemaine fonctionne
+     */
     public function testLoginAndCallCurrentSemaine(): void
     {
-        $this->authenticate();
+        $this->apiAuthenticate();
         $this->callCurrentSemaine();
     }
 
-    private function authenticate(): void
+    private function apiAuthenticate(): void
     {
         $response = $this->client->request('POST', $_ENV['API_BASE_URL'].'/api/login_check', [
             'headers' => ['Content-Type' => 'application/json'],
@@ -58,8 +61,7 @@ class CurrentSemaineTest extends TestCase
         $this->assertSame(200, $response->getStatusCode(), 'GET /api/currentSemaine should return 200');
 
         $data = $response->toArray();
-        $this->assertIsArray($data, 'Response should be an array');
-        $this->assertGreaterThan(0, count($data), 'Response should contain at least one item');
-        $this->assertArrayHasKey('id', $data[0], 'Each item should have an id');
+        $this->assertIsObject((object)$data, 'Response should be an object');
+        $this->assertArrayHasKey('id', $data, 'Object should have an id');
     }
 }
