@@ -28,13 +28,6 @@ class Film
     #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?string $titre = null;
 
-    // TODO: cohérence nullable
-    // TODO: incohérence  DateTime / Date
-    // actuellement ce champ est non-nullable en base, mais le validateur symfony accepte null
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
-    private ?\DateTimeInterface $date = null;
-
     #[ORM\Column]
     #[Groups(['film:read', 'film:write', "getPropositions", "filmsGagnants", 'preselection:read'])]
     #[SerializedName('sortie_film')]
@@ -82,18 +75,6 @@ class Film
     public function setTitre(string $titre): self
     {
         $this->titre = $titre;
-
-        return $this;
-    }
-
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): self
-    {
-        $this->date = $date;
 
         return $this;
     }

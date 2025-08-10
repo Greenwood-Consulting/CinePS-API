@@ -231,7 +231,6 @@ class FilmController extends AbstractController
         $newFilm = $serializer->deserialize($request->getContent(), Film::class, 'json', ['groups' => ['film:write'], 'datetime_timezone' => 'UTC']);
         
         $currentFilm->setTitre($newFilm->getTitre());
-        $currentFilm->setDate($newFilm->getDate());
         $currentFilm->setSortieFilm($newFilm->getSortieFilm());
         $currentFilm->setImdb($newFilm->getImdb());
 
