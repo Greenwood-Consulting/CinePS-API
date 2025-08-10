@@ -18,25 +18,25 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.15",
         "sensio/framework-extra-bundle": "^6.2",
-        "symfony/console": "6.2.*",
-        "symfony/dotenv": "6.2.*",
+        "symfony/console": "6.4.*",
+        "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.2.*",
-        "symfony/http-client": "^6.2",
-        "symfony/property-access": "6.2.*",
-        "symfony/property-info": "6.2.*",
-        "symfony/runtime": "6.2.*",
-        "symfony/security-bundle": "6.2.*",
-        "symfony/serializer": "6.2.*",
-        "symfony/validator": "6.2.*",
-        "symfony/yaml": "6.2.*",
+        "symfony/framework-bundle": "6.4.*",
+        "symfony/http-client": "6.4.*",
+        "symfony/property-access": "6.4.*",
+        "symfony/property-info": "6.4.*",
+        "symfony/runtime": "6.4.*",
+        "symfony/security-bundle": "6.4.*",
+        "symfony/serializer": "6.4.*",
+        "symfony/validator": "6.4.*",
+        "symfony/yaml": "6.4.*",
         "willdurand/hateoas-bundle": "^2.5"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "phpunit/phpunit": "^9.5",
-        "symfony/browser-kit": "6.2.*",
-        "symfony/css-selector": "6.2.*",
+        "symfony/browser-kit": "6.4.*",
+        "symfony/css-selector": "6.4.*",
         "symfony/maker-bundle": "^1.48",
         "symfony/phpunit-bridge": "^7.2"
     },
@@ -85,7 +85,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.2.*"
+            "require": "6.4.*"
         }
     }
 }
