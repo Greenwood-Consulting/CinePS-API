@@ -43,16 +43,11 @@ abstract class ApiTestCase extends TestCase
             return self::$cachedToken;
         }
 
-    // Debug temporaire : afficher les variables utiles
-    fwrite(STDERR, "API_BASE_URL=" . ($_ENV['API_BASE_URL'] ?? 'NON DEFINI') . PHP_EOL);
-    fwrite(STDERR, "API_EMAIL=" . ($_ENV['API_EMAIL'] ?? 'NON DEFINI') . PHP_EOL);
-    fwrite(STDERR, "API_PASSWORD=" . ($_ENV['API_PASSWORD'] ?? 'NON DEFINI') . PHP_EOL);
-
         // Adapte l’endpoint et le payload à ton API
         $resp = $this->client->request('POST', '/api/login_check', [
             'json' => [
-                'email' => $_ENV['API_EMAIL'] ?? 'a@a.fr',
-                'password' => $_ENV['API_PASSWORD'] ?? 'password',
+                'email' => $_ENV['API_EMAIL'],
+                'password' => $_ENV['API_PASSWORD'],
             ],
         ]);
 
