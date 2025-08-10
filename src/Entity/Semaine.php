@@ -8,7 +8,7 @@ use App\Repository\SemaineRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use App\Config\TypeSemaine;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: SemaineRepository::class)]
 class Semaine
@@ -55,6 +55,13 @@ class Semaine
     #[ORM\Column(length: 500, nullable: true)]
     #[Groups(["getPropositions"])]
     private ?string $raison_proposition_choisie = null;
+
+    // champ non persisté, à recalculer au besoin
+    // renvoie null, si le champ n'a pas été calulé
+    #[SerializedName('is_vote_termine')]
+    #[Groups(["getPropositions"])]
+    private ?bool $isVoteTermine = null;
+
 
     public function __construct()
     {
@@ -209,6 +216,17 @@ class Semaine
     {
         $this->raison_proposition_choisie = $raison_proposition_choisie;
 
+        return $this;
+    }
+    
+    public function isVoteTermine(): bool
+    {
+        return $this->isVoteTermine;
+    }
+
+    public function setIsVoteTermine(bool $isVoteTermine): self
+    {
+        $this->isVoteTermine = $isVoteTermine;
         return $this;
     }
 }
