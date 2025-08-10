@@ -101,10 +101,18 @@ tests/..
 
 ## 🤖 Tests automatisés
 
-package requis:
+### 📦 Installation du package de tests
 
-    composer require --dev symfony/test-pack
+Pour installer les dépendances nécessaires aux tests automatisés, exécute la commande suivante :
 
-lancer les tests:
+```bash
+composer require --dev symfony/test-pack
+```
 
-    php bin/phpunit
+### 🧪 Exécution des tests automatisés
+
+Pour exécuter les tests, utilisez la commande suivante :
+
+```bash
+php bin/phpunit
+```
