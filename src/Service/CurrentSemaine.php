@@ -3,6 +3,8 @@ namespace App\Service;
 
 use DateTime;
 use App\Entity\Semaine;
+use App\Entity\AVote;
+use App\Entity\Membre;
 use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -48,6 +50,38 @@ class CurrentSemaine
     public function getCurrentSemaine(SemaineRepository $semaineRepository): ?Semaine
     {
         return $semaineRepository->findOneByJour(date_create($this->getFridayCurrentSemaine()));
+    }
+
+
+    public function isVoteTermine(EntityManagerInterface $em): ?bool
+    {
+        $currentSemaine = $this->getCurrentSemaine($em->getRepository(Semaine::class));
+
+        if (!$currentSemaine) {
+            return null; // Semaine non trouvée
+        }   
+
+        $idCurrentSemaine = $currentSemaine->getId();
+
+        $votantsCount = $em->createQueryBuilder()
+        ->select('COUNT(a.votant)')
+        ->from(AVote::class, 'a')
+        ->where('a.semaine = :id')
+        ->setParameter('id', $idCurrentSemaine)
+        ->getQuery()
+        ->getSingleScalarResult();
+
+        $membreActifCount = $em->createQueryBuilder()
+        ->select('COUNT(m.id)')
+        ->from(Membre::class, 'm')
+        ->where('m.actif = 1')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+        // les ayants voté & le proposeur 
+        $vote_termine_cette_semaine = (($votantsCount + 1) === $membreActifCount);
+
+        return $vote_termine_cette_semaine;
     }
 }
 
