@@ -43,6 +43,7 @@ class IsPropositionTermineeController extends AbstractController
         ]
     )]
     //Indique si le vote pour la semaine $id_semaine est terminée
+    // Deprecated: use value in GET /api/currentSemaine instead
     #[Route('/api/isVoteTermine/{id_semaine}', name: 'is_vote_termine', methods: ['GET'])]
     public function isVoteTermineCetteSemaine(CurrentSemaine $currentSemaine, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {

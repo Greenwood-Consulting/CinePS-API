@@ -47,28 +47,11 @@ class SemaineController extends AbstractController
     )]
     // Retourne les datas de la semaine en cours
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
-    public function currentSemaine(SerializerInterface $serializer, SemaineRepository $semaineRepository): JsonResponse
+    public function currentSemaine(CurrentSemaine $currentSemaineService, SerializerInterface $serializer, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
     {
-        // Date du jour
-        $curdate=new DateTime();
-
-        // calcul de la date de fin de la période de vote
-        $fin_periode_vote = new DateTime("Fri 14:00");
-        $fin_periode_vote = $fin_periode_vote->format('Y-m-d H:i:s');
-
-        // conversion de la date de fin en timestamp
-        $deadline_vote = strtotime($fin_periode_vote);
-        $deadline_vote = $deadline_vote*1000;
-
-        // Get vendredi id_current_semaine
-        if ($curdate->format('D')=="Fri"){ // Si nous sommes vendredi, alors id_current_semaine est défini par ce vendredi
-            $friday_current_semaine = $curdate;
-        } else { // Sinon id_current_semaine est défini par vendredi prochain
-            $friday_current_semaine = $curdate->modify('next friday');
-        }
-
         //Récupère la propositionTerminé de id_semaine
-        $currentSemaine = $semaineRepository->findOneByJour($friday_current_semaine);
+        $currentSemaine = $currentSemaineService->getCurrentSemaine($semaineRepository);
+        $currentSemaine->setIsVoteTermine($currentSemaineService->isVoteTermine($em));
 
         if($currentSemaine) {
             $jsonFilmProposes = $serializer->serialize($currentSemaine, 'json', ['groups' => 'getPropositions']);
