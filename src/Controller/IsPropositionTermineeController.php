@@ -7,7 +7,7 @@ use App\Entity\AVote;
 use App\Entity\Membre;
 use App\Entity\Semaine;
 use OpenApi\Annotations\Parameter;
-use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

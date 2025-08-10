@@ -28,8 +28,7 @@
         "symfony/security-bundle": "6.4.*",
         "symfony/serializer": "6.4.*",
         "symfony/validator": "6.4.*",
-        "symfony/yaml": "6.4.*",
-        "willdurand/hateoas-bundle": "^2.5"
+        "symfony/yaml": "6.4.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
