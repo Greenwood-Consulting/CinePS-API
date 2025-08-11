@@ -26,26 +26,6 @@ class CurrentSemaine
         return $friday_current_semaine;
     }
 
-    public function getIdCurrentSemaine(EntityManagerInterface $entityManager): int
-    {
-        $friday_current_semaine = $this->getFridayCurrentSemaine();
-
-        //Récupère la propositionTerminé de id_semaine
-        $queryBuilder_get_id_current_semaine = $entityManager->createQueryBuilder();
-        $queryBuilder_get_id_current_semaine->select('s.id')
-        ->from(Semaine::class, 's')
-        ->where('s.jour = :jour')
-        ->setParameter('jour', $friday_current_semaine);
-
-        $result_current_semaine = $queryBuilder_get_id_current_semaine->getQuery()->getResult();
-
-        $id_current_semaine = $result_current_semaine[0]['id'];
-
-        if($result_current_semaine) {
-            return $id_current_semaine;
-        }
-        return 0;
-    }
 
     public function getCurrentSemaine(SemaineRepository $semaineRepository): ?Semaine
     {
