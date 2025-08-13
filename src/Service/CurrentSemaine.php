@@ -5,11 +5,17 @@ use DateTime;
 use App\Entity\Semaine;
 use App\Entity\AVote;
 use App\Entity\Membre;
-use App\Repository\SemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CurrentSemaine
 {
+
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
 
     public function getFridayCurrentSemaine(): string
     {
@@ -27,15 +33,16 @@ class CurrentSemaine
     }
 
 
-    public function getCurrentSemaine(SemaineRepository $semaineRepository): ?Semaine
+    public function getCurrentSemaine(): ?Semaine
     {
+        $semaineRepository = $this->em->getRepository(Semaine::class);
         return $semaineRepository->findOneByJour(date_create($this->getFridayCurrentSemaine()));
     }
 
 
-    public function isVoteTermine(EntityManagerInterface $em): ?bool
+    public function isVoteTermine(): ?bool
     {
-        $currentSemaine = $this->getCurrentSemaine($em->getRepository(Semaine::class));
+        $currentSemaine = $this->getCurrentSemaine();
 
         if (!$currentSemaine) {
             return null; // Semaine non trouvée
@@ -43,7 +50,7 @@ class CurrentSemaine
 
         $idCurrentSemaine = $currentSemaine->getId();
 
-        $votantsCount = $em->createQueryBuilder()
+        $votantsCount = $this->em->createQueryBuilder()
         ->select('COUNT(a.votant)')
         ->from(AVote::class, 'a')
         ->where('a.semaine = :id')
@@ -51,7 +58,7 @@ class CurrentSemaine
         ->getQuery()
         ->getSingleScalarResult();
 
-        $membreActifCount = $em->createQueryBuilder()
+        $membreActifCount = $this->em->createQueryBuilder()
         ->select('COUNT(m.id)')
         ->from(Membre::class, 'm')
         ->where('m.actif = 1')
