@@ -27,10 +27,6 @@ class Film
     #[Groups(["getPropositions", "filmsGagnants"])]
     private ?string $titre = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["getPropositions", "filmsGagnants"])]
-    private ?\DateTimeInterface $date = null;
-
     #[ORM\Column]
     #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $sortie_film = null;
@@ -72,18 +68,6 @@ class Film
     public function setTitre(string $titre): self
     {
         $this->titre = $titre;
-
-        return $this;
-    }
-
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): self
-    {
-        $this->date = $date;
 
         return $this;
     }
