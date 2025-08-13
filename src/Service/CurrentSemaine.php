@@ -12,6 +12,7 @@ class CurrentSemaine
 
     private EntityManagerInterface $em;
 
+    // Injection de la couche d'accès aux données
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -40,7 +41,17 @@ class CurrentSemaine
     }
 
 
-    public function isVoteTermine(): ?bool
+    // Recupère la semaine courante et calcule si les votes sont terminés
+    public function getCurrentSemaineAndMetadata(): ?Semaine
+    {
+        $currentSemaine = $this->getCurrentSemaine();
+        $currentSemaine->setIsVoteTermine($this->isVoteTermine());
+        return $currentSemaine;
+    }
+
+    // L'état "isVoteTermine" depend des votes mais aussi des membres actifs
+    // Il est plus facile de recaluler cette valeur a la demande plutoôt que de la stocker et de la maintenir à jour en base
+    private function isVoteTermine(): ?bool
     {
         $currentSemaine = $this->getCurrentSemaine();
 
@@ -65,7 +76,7 @@ class CurrentSemaine
         ->getQuery()
         ->getSingleScalarResult();
 
-        // les ayants voté & le proposeur 
+        // les ayant voté + le proposeur 
         $vote_termine_cette_semaine = (($votantsCount + 1) === $membreActifCount);
 
         return $vote_termine_cette_semaine;

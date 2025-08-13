@@ -49,9 +49,8 @@ class SemaineController extends AbstractController
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
     public function currentSemaine(CurrentSemaine $currentSemaineService, SerializerInterface $serializer): JsonResponse
     {
-        //Récupère la propositionTerminé de id_semaine
-        $currentSemaine = $currentSemaineService->getCurrentSemaine();
-        $currentSemaine->setIsVoteTermine($currentSemaineService->isVoteTermine());
+        // Recupère la semaine courante et calcule si les votes sont terminés
+        $currentSemaine = $currentSemaineService->getCurrentSemaineAndMetadata();
 
         if($currentSemaine) {
             $jsonFilmProposes = $serializer->serialize($currentSemaine, 'json', ['groups' => 'getPropositions']);
@@ -59,7 +58,6 @@ class SemaineController extends AbstractController
         } else {
             return new JsonResponse(["error" => "Not Found"], 404);
         }
-        
     }
 
     #[OA\Tag(name: 'Semaine')]
