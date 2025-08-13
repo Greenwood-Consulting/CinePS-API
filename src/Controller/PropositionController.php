@@ -47,7 +47,7 @@ class PropositionController extends AbstractController
     )]
     // Crée une nouvelle proposition et le film associé
     #[Route('/api/proposition', name: 'createProposition', methods: ['POST'])]
-    public function createProposition(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
+    public function createProposition(Request $request, CurrentSemaine $currentSemaine, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse
     {
         $array_request = json_decode($request->getContent(), true);
 
@@ -58,7 +58,7 @@ class PropositionController extends AbstractController
         $film->setImdb($array_request['imdb_film'] );
 
         $proposition = new Proposition();
-        $proposition->setSemaine($currentSemaine->getCurrentSemaine($semaineRepository));
+        $proposition->setSemaine($currentSemaine->getCurrentSemaine());
         $proposition->setFilm($film);
         $proposition->setScore(36);
 
@@ -100,7 +100,7 @@ class PropositionController extends AbstractController
     )]
     // Supprime une proposition et le film associé
     #[Route('/api/proposition/{proposition_id}', name: 'deleteProposition', methods: ['DELETE'])]
-    public function deleteProposition(int $proposition_id, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse {
+    public function deleteProposition(int $proposition_id, CurrentSemaine $currentSemaine, EntityManagerInterface $em): JsonResponse {
 
         $repository = $em->getRepository(Proposition::class);
         $proposition = $repository->find($proposition_id);
@@ -110,7 +110,7 @@ class PropositionController extends AbstractController
         }
 
         // On ne peut faire un delete de proposition que d'une proposition de la currentSemaine
-        $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
+        $semaine_courante = $currentSemaine->getCurrentSemaine();
         if (!isset($semaine_courante)) {
             return new JsonResponse(['error' => 'Cannot delete proposition, no current semaine'], Response::HTTP_CONFLICT);
         }
@@ -165,7 +165,7 @@ class PropositionController extends AbstractController
         $semaines = $semaineRepository->findBy(['proposeur' => $proposeur_id]);
 
         // Récupérer la semaine courante
-        $semaine_courante = $currentSemaine->getCurrentSemaine($semaineRepository);
+        $semaine_courante = $currentSemaine->getCurrentSemaine();
 
         $all_propositions = [];
         $film_titres = []; // Pour stocker les titres des films déjà ajoutés
@@ -268,7 +268,7 @@ class PropositionController extends AbstractController
         ]
     )]
     #[Route('/api/propositionOpenAI', name: 'createPropositionApi', methods: ['POST'])]
-    public function createPropositionOpenAI(Request $request, CurrentSemaine $currentSemaineService, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
+    public function createPropositionOpenAI(Request $request, CurrentSemaine $currentSemaineService, EntityManagerInterface $em): JsonResponse
     {
         $array_request = json_decode($request->getContent(), true);
         $theme = $array_request['theme'];
@@ -353,7 +353,7 @@ class PropositionController extends AbstractController
         $json_response_films = $result->choices[0]->message->content;
         $json_response_array = json_decode($json_response_films, true);
 
-        $currentSemaine = $currentSemaineService->getCurrentSemaine($semaineRepository);
+        $currentSemaine = $currentSemaineService->getCurrentSemaine();
 
         // Parcourir le tableau de films
         foreach ($json_response_array['films'] as $filmDataArray) {

@@ -47,11 +47,11 @@ class SemaineController extends AbstractController
     )]
     // Retourne les datas de la semaine en cours
     #[Route('/api/currentSemaine', name: 'currentSemaine', methods: ['GET'])]
-    public function currentSemaine(CurrentSemaine $currentSemaineService, SerializerInterface $serializer, SemaineRepository $semaineRepository, EntityManagerInterface $em): JsonResponse
+    public function currentSemaine(CurrentSemaine $currentSemaineService, SerializerInterface $serializer): JsonResponse
     {
         //Récupère la propositionTerminé de id_semaine
-        $currentSemaine = $currentSemaineService->getCurrentSemaine($semaineRepository);
-        $currentSemaine->setIsVoteTermine($currentSemaineService->isVoteTermine($em));
+        $currentSemaine = $currentSemaineService->getCurrentSemaine();
+        $currentSemaine->setIsVoteTermine($currentSemaineService->isVoteTermine());
 
         if($currentSemaine) {
             $jsonFilmProposes = $serializer->serialize($currentSemaine, 'json', ['groups' => 'getPropositions']);
