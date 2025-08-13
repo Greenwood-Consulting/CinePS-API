@@ -95,7 +95,7 @@ class AdminController extends AbstractController
         ]
     )]
     #[Route('/api/newSemaine', name:"createSemaine", methods: ['POST'])]
-    public function createSemaine(Request $request, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator): JsonResponse 
+    public function createSemaine(Request $request, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
     {
         $array_request = json_decode($request->getContent(), true);
         $membre = $membreRepository->findOneById($array_request['proposeur_id']);
@@ -115,9 +115,7 @@ class AdminController extends AbstractController
 
         $jsonSemaine = $serializer->serialize($new_semaine, 'json', ['groups' => 'getPropositions']);
         
-        $location = $urlGenerator->generate('detailSemaine', ['id' => $new_semaine->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonSemaine, Response::HTTP_CREATED, ["Location" => $location], true);
+        return new JsonResponse($jsonSemaine, Response::HTTP_CREATED, [], true);
     }
 
 }
