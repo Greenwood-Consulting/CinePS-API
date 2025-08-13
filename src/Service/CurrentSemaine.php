@@ -72,7 +72,8 @@ class CurrentSemaine
         $membreActifCount = $this->em->createQueryBuilder()
         ->select('COUNT(m.id)')
         ->from(Membre::class, 'm')
-        ->where('m.actif = 1')
+        ->where('m.actif = :actif')
+        ->setParameter('actif', true)
         ->getQuery()
         ->getSingleScalarResult();
 
