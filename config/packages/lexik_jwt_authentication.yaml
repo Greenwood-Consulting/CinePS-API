@@ -3,3 +3,4 @@ lexik_jwt_authentication:
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     user_identity_field: email
+    allow_no_expiration: true # ✅ important pour accepter les tokens sans exp
