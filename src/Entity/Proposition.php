@@ -16,8 +16,10 @@ class Proposition
     #[Groups(["getPropositions", "filmsGagnants"])]
     private ?int $id = null;
 
+    // TODO: attention,  un film peut potentiellement être associé à plusieurs propositions et dans ce cas cascade sur la suppression d'une proposition est dangereux
     #[ORM\ManyToOne(cascade: ['persist', 'remove'], inversedBy: 'propositions')]
-    #[ORM\JoinColumn(nullable: false)]
+    // Interdiction de supprimer un Film tant qu’il est encore référencé par au moins une Proposition.
+    #[ORM\JoinColumn(nullable: false, onDelete: 'RESTRICT')]
     #[Groups(["getPropositions"])]
     private ?Film $film = null;
 

@@ -20,6 +20,8 @@ class Note
     private ?int $note = null;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
+    // Interdiction de supprimer un Film tant qu’il est encore référencé par au moins une Note.
+    #[ORM\JoinColumn(onDelete: 'RESTRICT')]
     private ?Film $film = null;
 
     #[ORM\ManyToOne]
