@@ -17,7 +17,6 @@
         "openai-php/client": "^0.10.3",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.15",
-        "sensio/framework-extra-bundle": "^6.2",
         "symfony/console": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
