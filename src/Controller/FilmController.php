@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use  Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\DTO\CreateFilmInput;
 
