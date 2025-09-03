@@ -32,6 +32,10 @@ class Proposition
     #[Groups(["filmsGagnants"])]
     private ?Semaine $semaine = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    #[Groups(["getPropositions", "filmsGagnants"])]
+    private ?\DateTimeInterface $date = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -73,4 +77,15 @@ class Proposition
         return $this;
     }
 
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
 }
