@@ -95,7 +95,6 @@ class AppFixtures extends Fixture
             //Création film Thor
             $film_thor = new Film();
             $film_thor->setTitre("Thor");
-            $film_thor->setDate(new \DateTime('2022-01-01'));
             $film_thor->setSortiefilm("2020");
             $film_thor->setImdb("https://www.imdb.com/title/tt10648342/");
             $manager->persist($film_thor);
@@ -104,7 +103,6 @@ class AppFixtures extends Fixture
             //Création film Iron Man
             $film_iron_man = new Film();
             $film_iron_man->setTitre("Iron_man");
-            $film_iron_man->setDate(new \DateTime('2023-01-30'));
             $film_iron_man->setSortiefilm("2014");
             $film_iron_man->setImdb("https://www.imdb.com/title/tt10648342/");
             $manager->persist($film_iron_man);
@@ -112,7 +110,6 @@ class AppFixtures extends Fixture
             //Création film Iron Man
             $film_hulk = new Film();
             $film_hulk->setTitre("Hulk");
-            $film_hulk->setDate(new \DateTime('2023-01-30'));
             $film_hulk->setSortiefilm("2014");
             $film_hulk->setImdb("https://www.imdb.com/title/tt10648342/");
             $manager->persist($film_hulk);

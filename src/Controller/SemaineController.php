@@ -292,7 +292,6 @@ class SemaineController extends AbstractController
 
             $film = new Film();
             $film->setTitre($array_request['droit_divin_titre_film']);
-            $film->setDate(new DateTime());
             $film->setSortieFilm($array_request['droit_divin_date_film']);
             $film->setImdb($array_request['droit_divin_lien_imdb'] );
         

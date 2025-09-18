@@ -53,7 +53,6 @@ class PropositionController extends AbstractController
 
         $film = new Film();
         $film->setTitre($array_request['titre_film']);
-        $film->setDate(new DateTime());
         $film->setSortieFilm($array_request['sortie_film']);
         $film->setImdb($array_request['imdb_film'] );
 
@@ -61,6 +60,7 @@ class PropositionController extends AbstractController
         $proposition->setSemaine($currentSemaine->getCurrentSemaine());
         $proposition->setFilm($film);
         $proposition->setScore(36);
+        $proposition->setDate(new DateTime('now', new \DateTimeZone('UTC')));
 
         $em->persist($film);
         $em->persist($proposition);
@@ -212,7 +212,6 @@ class PropositionController extends AbstractController
                 // Créer une nouvelle instance de Film avec les mêmes données
                 $new_film = new Film();
                 $new_film->setTitre($film_existante->getTitre());
-                $new_film->setDate(new \DateTime()); // Par exemple, la date d'aujourd'hui
                 $new_film->setSortieFilm($film_existante->getSortieFilm());
                 $new_film->setImdb($film_existante->getImdb());
 
@@ -223,6 +222,7 @@ class PropositionController extends AbstractController
                 $new_proposition->setSemaine($semaine_courante);
                 $new_proposition->setFilm($new_film);
                 $new_proposition->setScore(36);
+                $new_proposition->setDate(new DateTime('now', new \DateTimeZone('UTC')));
 
                 $entityManager->persist($new_proposition);
 
@@ -367,7 +367,6 @@ class PropositionController extends AbstractController
                 $film->setTitre($titre_film);
                 $film->setImdb($lien_imdb);
                 $film->setSortieFilm((int)$sortie_film);
-                $film->setDate(new DateTime());
 
                 // Enregistrer le film en base de données
                 $em->persist($film);
@@ -377,6 +376,7 @@ class PropositionController extends AbstractController
                 $proposition->setSemaine($currentSemaine);
                 $proposition->setFilm($film);
                 $proposition->setScore(36);
+                $proposition->setDate(new DateTime('now', new \DateTimeZone('UTC')));
 
                 // Enregistrer la proposition en base de données
                 $em->persist($proposition);
