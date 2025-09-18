@@ -86,13 +86,13 @@ class VoteController extends AbstractController
     )]
     // Enregistre une nouvelle ligne dans la table 'AVote'
     #[Route('/api/avote/{id_membre}', name:"aVote", methods: ['POST'])]
-    public function avote(int $id_membre, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
+    public function avote(int $id_membre, CurrentSemaine $currentSemaine, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
     {
         $votant = $membreRepository->findOneById($id_membre);
 
         $avote = new AVote();
         $avote->setVotant($votant);
-        $avote->setSemaine($currentSemaine->getCurrentSemaine($semaineRepository));
+        $avote->setSemaine($currentSemaine->getCurrentSemaine());
 
         $em->persist($avote);
         $em->flush();
@@ -132,7 +132,7 @@ class VoteController extends AbstractController
     )]
     // Enregistre le vote et met à jour le score de la proposition
     #[Route('/api/saveVoteProposition', name:"saveVoteProposition", methods: ['POST'])]
-    public function saveVoteProposition(Request $request, CurrentSemaine $currentSemaine, SemaineRepository $semaineRepository, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
+    public function saveVoteProposition(Request $request, CurrentSemaine $currentSemaine, PropositionRepository $propositionRepository, MembreRepository $membreRepository, SerializerInterface $serializer, EntityManagerInterface $em): JsonResponse 
     {
         $array_request = json_decode($request->getContent(), true);
         $membre = $membreRepository->findOneById($array_request['membre']);
@@ -140,7 +140,7 @@ class VoteController extends AbstractController
         $proposition->setScore($proposition->getScore() - $array_request['vote']);
 
         $vote = new Vote();
-        $vote->setSemaine($currentSemaine->getCurrentSemaine($semaineRepository));
+        $vote->setSemaine($currentSemaine->getCurrentSemaine());
         $vote->setMembre($membre);
         $vote->setProposition($proposition);
         $vote->setVote($array_request['vote']);

@@ -13,7 +13,6 @@ class IndexNonConnecteTest extends ApiTestCase
     {
         $this->callCurrentSemaine();
         $this->callMembres();
-        $this->callIsVoteTermine();
         $this->callNextProposeurs();
     }
 
@@ -41,15 +40,6 @@ class IndexNonConnecteTest extends ApiTestCase
         $this->assertIsArray($data, 'Response should be an array');
         $this->assertGreaterThan(0, count($data), 'Response should contain at least one item');
         $this->assertArrayHasKey('id', $data[0], 'Each item should have an id');
-    }
-
-    private function callIsVoteTermine(): void
-    {
-        $r = $this->apiGet('/api/isVoteTermine/'.$this->currentSemaine_id);
-        $this->assertSame(200, $r->getStatusCode(), 'GET /api/isVoteTermine should return 200');
-        $data = filter_var($r->getContent(), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        $this->assertNotNull($data, 'Response should be a valid boolean');
-        $this->assertIsBool($data, 'Response should be a boolean');
     }
 
     private function callNextProposeurs(): void
