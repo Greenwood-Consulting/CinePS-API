@@ -35,9 +35,6 @@ class Membre
     #[ORM\Column]
     private ?bool $actif = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Membre')]
-    #[ORM\JoinColumn(nullable: false)]
-
     public function getId(): ?int
     {
         return $this->id;
