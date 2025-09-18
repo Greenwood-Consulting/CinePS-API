@@ -13,7 +13,6 @@ use App\Entity\Semaine;
 use App\Entity\Proposition;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use JMS\Serializer\Tests\Fixtures\DocBlockType\Collection\Product;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
