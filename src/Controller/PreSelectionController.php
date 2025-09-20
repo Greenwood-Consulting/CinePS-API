@@ -19,10 +19,10 @@ use App\DTO\PreSelectionInput;
 class PreSelectionController extends AbstractController
 {
 
+    #[OA\Tag(name: 'PreSelections')]
     #[OA\Get(
         path: '/api/preselections/{id}',
         summary: 'Récupère une pré-sélection',
-        tags: ['PreSelections'],
         parameters: [
             new OA\Parameter(
                 name: 'id',
@@ -55,10 +55,10 @@ class PreSelectionController extends AbstractController
     
 
     // TODO: if identification (via JWT token or else) is available, replace Route '/membres/{id}' by ''
+    #[OA\Tag(name: 'PreSelections')]
     #[OA\Get(
         path: '/api/preselections/membres/{id}',
         summary: 'Liste les pré-sélections associées à un membre',
-        tags: ['PreSelections'],
         parameters: [
             new OA\Parameter(
                 name: 'id',
@@ -94,6 +94,7 @@ class PreSelectionController extends AbstractController
     }
 
 
+    #[OA\Tag(name: 'PreSelections')]
     #[OA\Post(
         path: '/api/preselections',
         summary: 'Créer une présélection',
@@ -103,7 +104,6 @@ class PreSelectionController extends AbstractController
                 ref: new Model(type: PreSelectionInput::class, groups: ['preselection:write'])
             )
         ),
-        tags: ['PreSelections'],
         responses: [
             new OA\Response(
                 response: 201,
@@ -150,10 +150,10 @@ class PreSelectionController extends AbstractController
     }
 
 
+    #[OA\Tag(name: 'PreSelections')]
     #[OA\Delete(
         path: '/api/preselections/{id}',
         summary: 'Supprime une présélection',
-        tags: ['PreSelections'],
         parameters: [
             new OA\Parameter(
                 name: 'id',
