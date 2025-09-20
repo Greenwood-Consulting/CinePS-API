@@ -50,6 +50,20 @@ nelmio_api_doc:
                                                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                         '401':
                             description: Identifiants invalides
+            /api/doc.json:
+                get:
+                    tags: [Documentation]
+                    summary: "Récupère la documentation OpenAPI JSON"
+                    description: |
+                        Cet endpoint renvoie le fichier JSON OpenAPI complet de l'API.
+                        Utile pour importer la collection Postman ou pour des outils externes.
+                    responses:
+                        '200':
+                            description: "Fichier JSON OpenAPI"
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc) # Accepts routes under /api except /api/doc and /api/doc.json
