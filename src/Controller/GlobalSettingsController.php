@@ -14,10 +14,10 @@ use OpenApi\Attributes as OA;
 final class GlobalSettingsController extends AbstractController
 {
 
+    #[OA\Tag(name: 'Global Settings')]
     #[OA\Get(
         path: '/api/dlink',
         summary: 'Get the Dlink global setting',
-        tags: ["Global Settings"],
         responses: [
             new OA\Response(
                 response: 200,
@@ -47,10 +47,10 @@ final class GlobalSettingsController extends AbstractController
     }
 
 
+    #[OA\Tag(name: 'Global Settings')]
     #[OA\Put(
         path: '/api/dlink',
         summary: 'Update the Dlink global setting',
-        tags: ["Global Settings"],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
