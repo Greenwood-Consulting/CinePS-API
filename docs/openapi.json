@@ -104,8 +104,45 @@
             }
         },
         "/api/films/{id}": {
+            "get": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "R\u00e9cup\u00e8re un film par son identifiant",
+                "operationId": "get_film_find",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du film",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film trouv\u00e9",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Film"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film non trouv\u00e9"
+                    }
+                }
+            },
             "put": {
+                "tags": [
+                    "Films"
+                ],
                 "summary": "Modifier un film existant",
+                "operationId": "put_film_update",
                 "parameters": [
                     {
                         "name": "id",
@@ -123,7 +160,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Film"
+                                "$ref": "#/components/schemas/Film2"
                             }
                         }
                     }
@@ -135,34 +172,137 @@
                     "400": {
                         "description": "Donn\u00e9es invalides"
                     },
-                    "403": {
-                        "description": "Acc\u00e8s refus\u00e9"
-                    },
                     "404": {
                         "description": "Film non trouv\u00e9"
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Supprimer un film",
+                "description": "Supprime un film par son identifiant.",
+                "operationId": "deleteFilm",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du film \u00e0 supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Film supprim\u00e9 ou n'existe pas"
+                    },
+                    "409": {
+                        "description": "Impossible de supprimer un film avec des propositions ou des notes associ\u00e9es"
+                    }
+                }
             }
         },
-        "/api/Allfilms": {
-            "get": {
-                "summary": "R\u00e9cup\u00e9rer tous les films",
+        "/api/films": {
+            "post": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Cr\u00e9er un nouveau film",
+                "operationId": "post_film_create",
+                "requestBody": {
+                    "description": "Donn\u00e9es du film \u00e0 cr\u00e9er",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFilmInput"
+                            }
+                        }
+                    }
+                },
                 "responses": {
-                    "200": {
-                        "description": "Liste des films r\u00e9cup\u00e9r\u00e9e avec succ\u00e8s",
+                    "201": {
+                        "description": "Film cr\u00e9\u00e9 avec succ\u00e8s",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Film2"
-                                    }
+                                    "$ref": "#/components/schemas/Film"
                                 }
                             }
                         }
                     },
-                    "500": {
-                        "description": "Erreur serveur"
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "404": {
+                        "description": "Pre-Selection not found"
+                    }
+                }
+            }
+        },
+        "/api/dlink": {
+            "get": {
+                "tags": [
+                    "Global Settings"
+                ],
+                "summary": "Get the Dlink global setting",
+                "operationId": "get_global_settings_get_dlink",
+                "responses": {
+                    "200": {
+                        "description": "Returns the Dlink value",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "type": "string",
+                                            "example": "https://example.com/dlink"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Dlink not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Global Settings"
+                ],
+                "summary": "Update the Dlink global setting",
+                "operationId": "put_global_settings_update_dlink",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "value": {
+                                        "type": "string",
+                                        "example": "https://newlink.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Dlink updated successfully"
+                    },
+                    "400": {
+                        "description": "Missing \"value\" in request body"
+                    },
+                    "404": {
+                        "description": "Dlink not found"
                     }
                 }
             }
@@ -267,38 +407,6 @@
                     },
                     "404": {
                         "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/api/isVoteTermine/{id_semaine}": {
-            "get": {
-                "summary": "V\u00e9rifie si le vote pour une semaine est termin\u00e9",
-                "parameters": [
-                    {
-                        "name": "id_semaine",
-                        "in": "path",
-                        "description": "ID de la semaine",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Indique si le vote est termin\u00e9",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "boolean"
-                                },
-                                "example": true
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Semaine non trouv\u00e9e"
                     }
                 }
             }
@@ -476,6 +584,145 @@
                     },
                     "404": {
                         "description": "Membre ou film introuvable"
+                    }
+                }
+            }
+        },
+        "/api/preselections/{id}": {
+            "get": {
+                "tags": [
+                    "PreSelections"
+                ],
+                "summary": "R\u00e9cup\u00e8re une pr\u00e9-s\u00e9lection",
+                "operationId": "get_preselections_find",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant de la pr\u00e9-s\u00e9lection",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pr\u00e9-s\u00e9lection trouv\u00e9e",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreSelection"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pr\u00e9-s\u00e9lection non trouv\u00e9e"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "PreSelections"
+                ],
+                "summary": "Supprime une pr\u00e9s\u00e9lection",
+                "operationId": "delete_preselections_delete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant de la pr\u00e9s\u00e9lection \u00e0 supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Suppression r\u00e9ussie ou d\u00e9j\u00e0 inexistante (idempotent)"
+                    },
+                    "404": {
+                        "description": "Pr\u00e9s\u00e9lection introuvable (si type-hinting ou param converter \u00e9choue)"
+                    }
+                }
+            }
+        },
+        "/api/preselections/membres/{id}": {
+            "get": {
+                "tags": [
+                    "PreSelections"
+                ],
+                "summary": "Liste les pr\u00e9-s\u00e9lections associ\u00e9es \u00e0 un membre",
+                "operationId": "get_preselections_list",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du membre",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des pr\u00e9-s\u00e9lections trouv\u00e9es",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PreSelection"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Membre non trouv\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/preselections": {
+            "post": {
+                "tags": [
+                    "PreSelections"
+                ],
+                "summary": "Cr\u00e9er une pr\u00e9s\u00e9lection",
+                "operationId": "post_preselections_create",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PreSelectionInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pr\u00e9s\u00e9lection cr\u00e9\u00e9e",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PreSelection"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requ\u00eate invalide"
+                    },
+                    "404": {
+                        "description": "Membre introuvable"
+                    },
+                    "422": {
+                        "description": "Erreurs de validation"
                     }
                 }
             }
@@ -1171,7 +1418,8 @@
                     "propositions",
                     "proposeur",
                     "votants",
-                    "type"
+                    "type",
+                    "is_vote_termine"
                 ],
                 "properties": {
                     "id": {
@@ -1209,14 +1457,95 @@
                                 "$ref": "#/components/schemas/Film3"
                             }
                         ]
+                    },
+                    "is_vote_termine": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
             },
             "Film": {
+                "required": [
+                    "id",
+                    "titre",
+                    "date",
+                    "sortie_film",
+                    "imdb"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "titre": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sortie_film": {
+                        "type": "integer"
+                    },
+                    "imdb": {
+                        "type": "string"
+                    }
+                },
                 "type": "object"
             },
             "Film2": {
+                "required": [
+                    "titre",
+                    "date",
+                    "sortie_film",
+                    "imdb"
+                ],
+                "properties": {
+                    "titre": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sortie_film": {
+                        "type": "integer"
+                    },
+                    "imdb": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateFilmInput": {
+                "required": [
+                    "titre",
+                    "date",
+                    "sortie_film",
+                    "imdb"
+                ],
+                "properties": {
+                    "titre": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sortie_film": {
+                        "type": "integer"
+                    },
+                    "imdb": {
+                        "type": "string"
+                    },
+                    "pre_selection_id": {
+                        "type": "integer",
+                        "nullable": true
+                    }
+                },
                 "type": "object"
             },
             "Membre3": {
@@ -1251,6 +1580,47 @@
                 "type": "object"
             },
             "Note": {
+                "type": "object"
+            },
+            "PreSelection": {
+                "required": [
+                    "id",
+                    "films",
+                    "membre",
+                    "theme"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "films": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Film4"
+                        }
+                    },
+                    "membre": {
+                        "$ref": "#/components/schemas/Membre5"
+                    },
+                    "theme": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "PreSelectionInput": {
+                "required": [
+                    "membre_id",
+                    "theme"
+                ],
+                "properties": {
+                    "membre_id": {
+                        "type": "integer"
+                    },
+                    "theme": {
+                        "type": "string"
+                    }
+                },
                 "type": "object"
             },
             "Proposition": {
@@ -1353,6 +1723,7 @@
                     "id",
                     "titre",
                     "date",
+                    "sortie_film",
                     "imdb"
                 ],
                 "properties": {
@@ -1368,8 +1739,52 @@
                         "type": "string",
                         "format": "date-time"
                     },
+                    "sortie_film": {
+                        "type": "integer"
+                    },
                     "imdb": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Film4": {
+                "required": [
+                    "id",
+                    "titre",
+                    "date",
+                    "sortie_film",
+                    "imdb"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "titre": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sortie_film": {
+                        "type": "integer"
+                    },
+                    "imdb": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Membre5": {
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -1383,7 +1798,9 @@
                     "proposeur",
                     "votants",
                     "type",
-                    "propositionTermine"
+                    "is_vote_termine",
+                    "propositionTermine",
+                    "voteTermine"
                 ],
                 "properties": {
                     "id": {
@@ -1418,9 +1835,12 @@
                         "nullable": true,
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/Film4"
+                                "$ref": "#/components/schemas/Film5"
                             }
                         ]
+                    },
+                    "is_vote_termine": {
+                        "type": "boolean"
                     },
                     "propositionTermine": {
                         "type": "boolean"
@@ -1428,6 +1848,9 @@
                     "raisonPropositionChoisie": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "voteTermine": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -1444,7 +1867,7 @@
                         "type": "integer"
                     },
                     "film": {
-                        "$ref": "#/components/schemas/Film4"
+                        "$ref": "#/components/schemas/Film5"
                     },
                     "score": {
                         "type": "integer"
@@ -1455,15 +1878,16 @@
                 },
                 "type": "object"
             },
-            "Film4": {
+            "Film5": {
                 "required": [
                     "id",
                     "titre",
                     "date",
+                    "sortie_film",
                     "imdb",
                     "propositions",
                     "notes",
-                    "sortieFilm"
+                    "preSelections"
                 ],
                 "properties": {
                     "id": {
@@ -1477,6 +1901,9 @@
                     "date": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "sortie_film": {
+                        "type": "integer"
                     },
                     "imdb": {
                         "type": "string"
@@ -1503,8 +1930,11 @@
                         "format": "float",
                         "nullable": true
                     },
-                    "sortieFilm": {
-                        "type": "integer"
+                    "preSelections": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PreSelection2"
+                        }
                     }
                 },
                 "type": "object"
@@ -1525,7 +1955,7 @@
                         "nullable": true,
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/Film4"
+                                "$ref": "#/components/schemas/Film5"
                             }
                         ]
                     },
@@ -1539,45 +1969,74 @@
                     }
                 },
                 "type": "object"
+            },
+            "PreSelection2": {
+                "required": [
+                    "id",
+                    "films",
+                    "membre",
+                    "theme"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "films": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Film5"
+                        }
+                    },
+                    "membre": {
+                        "$ref": "#/components/schemas/Membre3"
+                    },
+                    "theme": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
             }
         }
     },
     "tags": [
         {
-            "name": "Admin",
-            "description": "Admin"
+            "name": "Admin"
         },
         {
-            "name": "Historique",
-            "description": "Historique"
+            "name": "Historique"
         },
         {
-            "name": "Membre",
-            "description": "Membre"
+            "name": "Membre"
         },
         {
-            "name": "Note",
-            "description": "Note"
+            "name": "Note"
         },
         {
-            "name": "Profil",
-            "description": "Profil"
+            "name": "Profil"
         },
         {
-            "name": "Proposition",
-            "description": "Proposition"
+            "name": "Proposition"
         },
         {
-            "name": "Semaine",
-            "description": "Semaine"
+            "name": "Semaine"
         },
         {
-            "name": "Statistics",
-            "description": "Statistics"
+            "name": "Statistics"
         },
         {
-            "name": "Vote",
-            "description": "Vote"
+            "name": "Vote"
+        },
+        {
+            "name": "Films",
+            "description": "Films"
+        },
+        {
+            "name": "Global Settings",
+            "description": "Global Settings"
+        },
+        {
+            "name": "PreSelections",
+            "description": "PreSelections"
         }
     ]
 }
