@@ -27,7 +27,7 @@ class Membre
     private ?string $prenom = null;
 
     #[Groups(['membre:read'])]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $mail = null;
 
     #[ORM\Column(length: 255)]
