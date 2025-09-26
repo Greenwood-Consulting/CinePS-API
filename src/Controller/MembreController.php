@@ -28,16 +28,8 @@ class MembreController extends AbstractController
                 description: "Successful response",
                 content: new OA\JsonContent(
                     type: "array",
-                    items: new OA\Items(ref: new Model(type: Membre::class))
+                    items: new OA\Items(ref: new Model(type: Membre::class, groups: ['membre:read']))
                 )
-            ),
-            new OA\Response(
-                response: 404,
-                description: "Membre not found"
-            ),
-            new OA\Response(
-                response: 400,
-                description: "Bad request"
             )
         ]
     )]
@@ -47,7 +39,7 @@ class MembreController extends AbstractController
 
         $membreList = $membreRepository->findAll();
 
-        $jsonMembreList = $serializer->serialize($membreList, 'json');
+        $jsonMembreList = $serializer->serialize($membreList, 'json', ['groups' => 'membre:read']);
         return new JsonResponse($jsonMembreList, Response::HTTP_OK, [], true);
     }
 
@@ -70,7 +62,9 @@ class MembreController extends AbstractController
             new OA\Response(
                 response: 200,
                 description: "Membre details retrieved successfully",
-                content: new OA\JsonContent(ref: new Model(type: Membre::class))
+                content: new OA\JsonContent(
+                    ref: new Model(type: Membre::class, groups: ['membre:read'])
+                )
             ),
             new OA\Response(
                 response: 404,
@@ -84,7 +78,7 @@ class MembreController extends AbstractController
 
         $membre = $membreRepository->find($id);
         if($membre) {
-            $jsonMembre = $serializer->serialize($membre, 'json');
+            $jsonMembre = $serializer->serialize($membre, 'json', ['groups' => 'membre:read']);
             return new JsonResponse($jsonMembre, Response::HTTP_OK, [], true);
         }
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
