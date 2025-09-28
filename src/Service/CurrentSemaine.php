@@ -59,6 +59,12 @@ class CurrentSemaine
             return null; // Semaine non trouvée
         }   
 
+        // Vérifie si la plage temporelle de vote est terminée
+        if ($currentSemaine->hasVoteDeadlinePassed()) {
+            return true;
+        }
+
+        // Vérifie si les membres actifs ont tous votés
         $idCurrentSemaine = $currentSemaine->getId();
 
         $votantsCount = $this->em->createQueryBuilder()
@@ -77,7 +83,7 @@ class CurrentSemaine
         ->getQuery()
         ->getSingleScalarResult();
 
-        // les ayant voté + le proposeur 
+        // compare les ayant voté + le proposeur au nombre de membres actifs
         $vote_termine_cette_semaine = (($votantsCount + 1) === $membreActifCount);
 
         return $vote_termine_cette_semaine;
