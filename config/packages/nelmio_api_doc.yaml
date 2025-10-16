@@ -1,8 +1,8 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: CinePs API
+            description: API de l'app CinePS
             version: 1.0.0
         servers:
             - url: "{{url_api}}" # <-- variable pour simplifier l'utilisation via Postman
