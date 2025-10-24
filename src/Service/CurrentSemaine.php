@@ -45,7 +45,9 @@ class CurrentSemaine
     public function getCurrentSemaineAndMetadata(): ?Semaine
     {
         $currentSemaine = $this->getCurrentSemaine();
-        $currentSemaine->setIsVoteTermine($this->isVoteTermine());
+        if($currentSemaine !== null) {
+            $currentSemaine->setIsVoteTermine($this->isVoteTermine());
+        }
         return $currentSemaine;
     }
 
