@@ -22,7 +22,7 @@ class PreSelection
     #[Groups(['preselection:read'])]
     private Collection $films;
 
-    #[ORM\ManyToOne(inversedBy: 'preSelections')]
+    #[ORM\ManyToOne(targetEntity: Membre::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: "Le membre est obligatoire")]
     #[Groups(['preselection:read', 'preselection:write'])]
