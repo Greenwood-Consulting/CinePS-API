@@ -13,7 +13,37 @@ Backend de l'application CinePS — une API REST développée avec Symfony pour 
 
 ## 🚀 Installation
 
-A compléter.
+### Prérequis
+
+Modules PHP à activer si ce n'est pas déjà fait :
+- extension=sodium
+
+### Procédure d'installation
+
+- Cloner le dépôt Git
+- Faire un composer install
+
+```bash
+composer install
+```
+
+- Créer un jeu de clés pour Lexik. Par exemple en utilisant cette commande (ou d'autres commandes en fonction de l'OS d'installation)
+
+```bash
+php bin/console lexik:jwt:generate-keypair
+```
+
+## Mise à jour de l'application
+
+### Base de données
+
+Pour déployer sur un serveur où on a pas accès à la console PHP, une possibilité est de générer un fichier SQL de migration à partir des fichiers PHP de migration générés par Symfony.
+
+Exemple :
+
+```bash
+php bin/console doctrine:migrations:execute DoctrineMigrations\Version20250813222957 --dry-run --write-sql --up
+```
 
 ## 📘 Documentation OpenAPI
 
