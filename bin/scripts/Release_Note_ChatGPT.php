@@ -65,7 +65,7 @@ doivent pas être mentionnés.
 Voici maintenant le texte du git log sur lequel tu dois travailler : ".$git_log;
 
     $body = [
-        'model' => 'gpt-4',
+        'model' => 'gpt-5',
         'messages' => [
             ['role' => 'user', 'content' => $prompt]
         ],
