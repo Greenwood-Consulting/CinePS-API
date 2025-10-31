@@ -229,4 +229,31 @@ class Semaine
         $this->isVoteTermine = $isVoteTermine;
         return $this;
     }
+
+    // Renvoie la date et l'heure de la deadline du vote de cette semaine.
+    // Le lendemain de la deadline commence la semaine suivante.
+    // TODO: utiliser un groupe nommé 'semaine:read' serait plus clair que 'getPropositions'
+    #[SerializedName('vote_deadline')]
+    #[Groups(['getPropositions'])]
+    public function getVoteDeadline(): \DateTimeImmutable
+    {
+        $day = $_ENV['VOTE_DEADLINE_DAY'] ?? 'Fri';
+        $time = $_ENV['VOTE_DEADLINE_TIME'] ?? '18:00';
+        $tz = $_ENV['VOTE_DEADLINE_TZ'] ?? 'UTC';
+    
+        // 1 - creé une date "now" avec la timezone souhaitée
+        // 2 - si le jour souhaité n'est pas aujourd'hui, ajoute des jours
+        // 3 - fixe l'heure souhaitée
+        // peut être aujourd'hui (possiblement avant l'heure en cours), ou dans le futur
+        return new \DateTimeImmutable("$day $time", new \DateTimeZone($tz));
+    }
+
+
+    // Verifie si la plage temporelle de vote est achevée
+    public function hasVoteDeadlinePassed(): bool {
+        $tz = $_ENV['VOTE_DEADLINE_TZ'] ?? 'UTC';
+        $now = new \DateTimeImmutable("now", new \DateTimeZone($tz));
+        
+        return $this->getVoteDeadline() < $now;
+    }
 }
