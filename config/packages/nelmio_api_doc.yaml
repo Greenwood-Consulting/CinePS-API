@@ -1,9 +1,69 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: CinePs API
+            description: API de l'app CinePS
             version: 1.0.0
+        servers:
+            - url: "{{url_api}}" # <-- variable pour simplifier l'utilisation via Postman
+        components:
+            securitySchemes:
+                BearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        # règle globale → tous les endpoints nécessitent BearerAuth par défaut            
+        security:
+            - BearerAuth: []
+            
+        # description du end point auto-generé (mais pas documenté): login_check
+        paths:
+            /api/login_check:
+                post:
+                    tags: 
+                      - Authentication
+                    summary: Authentification par login/mot de passe
+                    security: []   # <-- pas de sécurité requise pour ce endpoint
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        email:
+                                            type: string
+                                            example: "user@example.com"
+                                        password:
+                                            type: string
+                                            example: "password"
+                    responses:
+                        '200':
+                            description: Jeton JWT
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        '401':
+                            description: Identifiants invalides
+            /api/doc.json:
+                get:
+                    tags: [Documentation]
+                    summary: "Récupère la documentation OpenAPI JSON"
+                    description: |
+                        Cet endpoint renvoie le fichier JSON OpenAPI complet de l'API.
+                        Utile pour importer la collection Postman ou pour des outils externes.
+                    responses:
+                        '200':
+                            description: "Fichier JSON OpenAPI"
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc) # Accepts routes under /api except /api/doc and /api/doc.json

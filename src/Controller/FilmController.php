@@ -20,10 +20,10 @@ use App\DTO\CreateFilmInput;
 
 class FilmController extends AbstractController
 {
+    #[OA\Tag(name: 'Films')]
     #[OA\Get(
         path: '/api/films/{id}',
         summary: 'Récupère un film par son identifiant',
-        tags: ['Films'],
         parameters: [
             new OA\Parameter(
                 name: 'id',
@@ -53,10 +53,10 @@ class FilmController extends AbstractController
     }
 
 
+    #[OA\Tag(name: 'Films')]
     #[OA\Post(
         path: '/api/films',
         summary: 'Créer un nouveau film',
-        tags: ['Films'],
         requestBody: new OA\RequestBody(
             required: true,
             description: 'Données du film à créer',
@@ -130,12 +130,12 @@ class FilmController extends AbstractController
     }
 
     
+    #[OA\Tag(name: 'Films')]
     #[OA\Delete(
         path: "/api/films/{id}",
         summary: "Supprimer un film",
         description: "Supprime un film par son identifiant.",
         operationId: "deleteFilm",
-        tags: ["Films"],
         parameters: [
             new OA\Parameter(
                 name: "id",
@@ -189,10 +189,10 @@ class FilmController extends AbstractController
     
     // @TODO : est-ce que ce contrôleur est utilisé ? Non
     // actuellement reservé au role admin ?
+    #[OA\Tag(name: 'Films')]
     #[OA\Put(
         path: "/api/films/{id}",
         summary: "Modifier un film existant",
-        tags: ["Films"],
         requestBody: new OA\RequestBody(
             description: "Données du film à modifier",
             required: true,
