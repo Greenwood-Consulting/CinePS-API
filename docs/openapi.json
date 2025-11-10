@@ -1,11 +1,87 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "My App",
-        "description": "This is an awesome app!",
+        "title": "CinePs API",
+        "description": "API de l'app CinePS",
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "{{url_api}}"
+        }
+    ],
     "paths": {
+        "/api/login_check": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authentification par login/mot de passe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Jeton JWT",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/api/doc.json": {
+            "get": {
+                "tags": [
+                    "Documentation"
+                ],
+                "summary": "R\u00e9cup\u00e8re la documentation OpenAPI JSON",
+                "description": "Cet endpoint renvoie le fichier JSON OpenAPI complet de l'API.\nUtile pour importer la collection Postman ou pour des outils externes.\n",
+                "responses": {
+                    "200": {
+                        "description": "Fichier JSON OpenAPI",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/newmembre": {
             "post": {
                 "tags": [
@@ -1996,11 +2072,29 @@
                 },
                 "type": "object"
             }
+        },
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
         }
     },
+    "security": [
+        {
+            "BearerAuth": []
+        }
+    ],
     "tags": [
         {
             "name": "Admin"
+        },
+        {
+            "name": "Films"
+        },
+        {
+            "name": "Global Settings"
         },
         {
             "name": "Historique"
@@ -2010,6 +2104,9 @@
         },
         {
             "name": "Note"
+        },
+        {
+            "name": "PreSelections"
         },
         {
             "name": "Profil"
@@ -2027,16 +2124,12 @@
             "name": "Vote"
         },
         {
-            "name": "Films",
-            "description": "Films"
+            "name": "Authentication",
+            "description": "Authentication"
         },
         {
-            "name": "Global Settings",
-            "description": "Global Settings"
-        },
-        {
-            "name": "PreSelections",
-            "description": "PreSelections"
+            "name": "Documentation",
+            "description": "Documentation"
         }
     ]
 }

@@ -55,7 +55,7 @@ php bin/console doctrine:migrations:execute DoctrineMigrations\Version2025081322
 php -S localhost:8000 -t public public/index.php
 ```
 
-> ⚠️ **Important** : il est essentiel d'utiliser `public/index.php` comme routeur.  
+> ⚠️⚠️⚠️ **Important** : il est essentiel d'utiliser `public/index.php` comme routeur.  
 > Cela permet au serveur PHP d’interpréter correctement les routes contenant une extension comme `.json`.  
 > Sinon, des erreurs 404 peuvent survenir pour des routes comme `/api/doc.json`.
 
@@ -89,8 +89,16 @@ php bin/console nelmio:api:dump --format=json > docs/openapi.json
 ### 4. Commande utilisée pour générer le fichier redoc
 
 ```bash
-npx @redocly/cli build-docs doc/openapi.json -o doc/redoc.html
+npx @redocly/cli build-docs docs/openapi.json -o docs/redoc.html
 ```
+
+> ⚠️⚠️⚠️ Cette erreur peut se produire à la génération du fichier :
+> ```bash Error: null byte is not allowed in input in "/mnt/c/xampp/htdocs/CinePS-API/docs/openapi.json" (1:4) ```
+>
+> Une solution :
+> - Ouvrir le fichier généré dans VSCode
+> - En bas à droite, vérifier que l’encodage est bien UTF-8.
+> - Si ce n’est pas le cas, cliquer dessus et faire → Reopen with Encoding → UTF-8.
 
 ## 📂 Structure du projet
 
