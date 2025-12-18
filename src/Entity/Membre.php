@@ -15,23 +15,25 @@ class Membre
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getPropositions", "filmsGagnants", 'preselection:read'])]
+    #[Groups(['membre:read', "getPropositions", "filmsGagnants", 'preselection:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getPropositions", "filmsGagnants", "postMembre"])]
+    #[Groups(['membre:read', "getPropositions", "filmsGagnants", "postMembre"])]
     private ?string $nom = null;
 
-    #[Groups(["getPropositions", "postMembre"])]
+    #[Groups(['membre:read', "getPropositions", "postMembre"])]
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
+    #[Groups(['membre:read'])]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $mail = null;
 
     #[ORM\Column(length: 255)]
     private ?string $mdp = null;
 
+    #[Groups(['membre:read'])]
     #[ORM\Column]
     private ?bool $actif = null;
 
