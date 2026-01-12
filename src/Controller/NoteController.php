@@ -32,7 +32,7 @@ class NoteController extends AbstractController
                 properties: [
                     new OA\Property(property: 'membre_id', type: 'integer', description: 'ID du membre notateur'),
                     new OA\Property(property: 'film_id', type: 'integer', description: 'ID du film à noter'),
-                    new OA\Property(property: 'note', type: 'integer', nullable: true, description: 'Note attribuée au film (optionnelle)')
+                    new OA\Property(property: 'note', type: 'number', format: 'float', nullable: true, description: 'Note attribuée au film (optionnelle)')
                 ]
             )
         ),

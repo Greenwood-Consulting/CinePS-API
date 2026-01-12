@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Film;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\NoteRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -15,9 +16,9 @@ class Note
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
     #[Groups(["filmsGagnants"])]
-    private ?int $note = null;
+    private ?float $note = null;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     // Interdiction de supprimer un Film tant qu’il est encore référencé par au moins une Note.
@@ -33,12 +34,12 @@ class Note
         return $this->id;
     }
 
-    public function getNote(): ?int
+    public function getNote(): ?float
     {
         return $this->note;
     }
 
-    public function setNote(?int $note): self
+    public function setNote(?float $note): self
     {
         $this->note = $note;
 
