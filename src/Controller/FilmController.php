@@ -104,8 +104,6 @@ class FilmController extends AbstractController
 
         $newFilm = new Film();
         $newFilm->setTitre($input->titre);
-        // pour le stockage en BDD, on force la timezone UTC par convention
-        $newFilm->setDate($input->date->setTimezone(new \DateTimeZone('UTC')));
         $newFilm->setSortieFilm($input->sortie_film);
         $newFilm->setImdb($input->imdb);
 
@@ -231,7 +229,6 @@ class FilmController extends AbstractController
         $newFilm = $serializer->deserialize($request->getContent(), Film::class, 'json', ['groups' => ['film:write'], 'datetime_timezone' => 'UTC']);
         
         $currentFilm->setTitre($newFilm->getTitre());
-        $currentFilm->setDate($newFilm->getDate());
         $currentFilm->setSortieFilm($newFilm->getSortieFilm());
         $currentFilm->setImdb($newFilm->getImdb());
 
