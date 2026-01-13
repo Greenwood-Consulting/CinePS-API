@@ -62,6 +62,14 @@ class Film
         $this->preSelections = new ArrayCollection();
     }
 
+    // permet de creer un clone du film sans lien avec une eventuelle proposition ou pré-sélection
+    public function __clone(): void
+    {
+        $this->id = null;
+        $this->propositions = new ArrayCollection();
+        $this->preSelections = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

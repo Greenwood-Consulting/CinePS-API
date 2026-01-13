@@ -18,7 +18,8 @@ class PreSelection
     #[Groups(['preselection:read'])]
     private ?int $id = null;
 
-    #[ORM\ManyToMany(mappedBy: "preSelections", targetEntity: Film::class)]
+    // supprimer une pre-selection supprime en cascade les films associés
+    #[ORM\ManyToMany(mappedBy: "preSelections", targetEntity: Film::class, cascade: ['persist', 'remove'])]
     #[Groups(['preselection:read'])]
     private Collection $films;
 

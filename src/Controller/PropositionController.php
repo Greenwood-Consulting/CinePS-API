@@ -11,16 +11,151 @@ use App\Entity\Semaine;
 use App\Entity\Proposition;
 use App\Service\CurrentSemaine;
 use App\Repository\SemaineRepository;
+use App\Repository\PreSelectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\DTO\CreatePropositionsInput;
 
 class PropositionController extends AbstractController
 {
+
+    #[OA\Tag(name: "Proposition")]
+    #[OA\Post(
+        path: "/api/propositions",
+        summary: "Proposer tous les films d'un pré-sélection",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                ref: new Model(type: CreatePropositionsInput::class, groups: ['propositions:write'])
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Propositions créées avec succès',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref:new Model(type: Proposition::class, groups: ['getPropositions'])
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Action interdite (si les propositions ont déjà été faites cette semaine)"
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Règles métier non respectées (pré-sélection invalide, nombre de films invalide)'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Pré-Sélection introuvable'
+            )
+        ]
+    )]
+    // Proposer tous les films d'un pré-sélection
+    #[Route('/api/propositions', name: 'createPropositionFromPreselection', methods: ['POST'])]
+    public function createPropositionFromPreselection(Request $request, CurrentSemaine $currentSemaineService, PreSelectionRepository $preSelectionRepository, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
+    {
+
+        $currentSemaine =  $currentSemaineService->getCurrentSemaine();
+
+        // on interdit de proposer si les propositions ont déjà été effectuées
+        if ($currentSemaine->isPropositionTermine()) {
+            return new JsonResponse(
+                ['error' => 'Les propositions sont terminées cette semaine'],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        // TODO: que fait-on s'il existe deja des propositions mais que l'ensemble des propositions n'ont pas été validées par le proposeur?
+        // pour l'instant rien: on ajoute les nouvelles propositions aux anciennes et on clôt les proposition pour la semaine
+        // on va quand même tenir compte du nombre de propositions existantes pour limiter le nombre de film proposés
+        $existingPropositionSize = sizeof($currentSemaine->getPropositions());
+
+        // Validation de l'entité CreatePropositionsInput
+        $input = $serializer->deserialize($request->getContent(), CreatePropositionsInput::class, 'json', ['groups' => ['propositions:write']]);
+        $errors = $validator->validate($input);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // Récupération de la préselection
+        $preselection = $preSelectionRepository->find($input->preselection_id);
+        if (!$preselection) {
+            return new JsonResponse(
+                ['error' => 'Pré-sélection introuvable'],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        // TODO: check if current user own this pré-sélection
+        // pré-requis: que l'API ait connaissance de l'identité de l'user (sur la base d'un token JWT?)
+
+        // vérifie le nombre de films minimum pour cette pré-sélection
+        $preselectionSize = sizeof($preselection->getFilms());
+
+        if ($preselectionSize <= 0) {
+            return new JsonResponse(
+                ['error' => 'Au moins un film est requis pour créer une proposition'],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        // verifie que le nombre de films proposés ne dépasse pas la limite
+        $propositionSize = $preselectionSize + $existingPropositionSize;
+
+        $maxFilmsPerProposition = $_ENV['MAX_FILMS_PER_PROPOSITION'] ?? 5;
+        if ($propositionSize > $maxFilmsPerProposition) {
+            return new JsonResponse(
+                [
+                    'error' => 'Le nombre de films dépasse la limite autorisée',
+                    'max' => $maxFilmsPerProposition
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+        
+        // pour chaque film de la pré-sélection
+        $propositions = [];
+        foreach ($preselection->getFilms() as $film) {
+            $proposition = new Proposition();
+            $proposition->setSemaine($currentSemaine);
+            // on clone le film pour eviter que la proposition et la pré-sélection soit liés a la même entité film, et eviter les problèmes de cascade
+            $clonedFilm = clone $film;
+            $proposition->setFilm($clonedFilm);
+            $proposition->setScore(36);
+
+            $em->persist($proposition);
+            $propositions[] = $proposition;
+        }
+
+        // mettre a jour la semaine
+        $currentSemaine->setTheme($preselection->getTheme());
+        $currentSemaine->setPropositionTermine(true);
+        $em->persist($currentSemaine);
+
+        // TODO: ? Suppression de la préselection ? je prefere laisser le choix a l'utilisateur de le faire ou pas manuellement
+        // suppression en cascade des films 
+        // $em->remove($preselection);
+
+        $em->flush();
+
+        $jsonPropositions = $serializer->serialize($propositions, 'json', ['groups' => ['getPropositions']]); 
+        return new JsonResponse($jsonPropositions, Response::HTTP_CREATED, [], true);
+    }
+
 
     #[OA\Tag(name: "Proposition")]
     #[OA\Post(
