@@ -11,10 +11,6 @@ class CreateFilmInput
     public string $titre;
 
     #[Assert\NotNull]
-    #[Groups(['film:write'])]
-    public \DateTimeInterface $date;
-
-    #[Assert\NotNull]
     #[Assert\Type('integer')]
     #[Groups(['film:write'])]
     public int $sortie_film;

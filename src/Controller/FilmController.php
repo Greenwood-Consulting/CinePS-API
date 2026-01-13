@@ -120,8 +120,6 @@ class FilmController extends AbstractController
 
         $em->persist($newFilm);
         $em->flush();
-        // refresh $newFilm to get the truncated date
-        $em->refresh($newFilm);
 
         $jsonFilm = $serializer->serialize($newFilm, 'json', ['groups' => ['film:read']]);
         return new JsonResponse($jsonFilm, JsonResponse::HTTP_CREATED, [], true);
