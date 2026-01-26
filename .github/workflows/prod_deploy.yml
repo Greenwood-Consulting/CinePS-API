@@ -21,6 +21,6 @@ jobs:
         lftp -f "
         set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
         open -u ${{ secrets.PROD_SFTP_USER }},${{ secrets.PROD_SFTP_PASSWORD }} sftp://${{ secrets.PROD_SFTP_HOST }}
-        mirror -R --delete ./ /lamp0/web/vhosts/prod-ps-api.gc2.fr/htdocs --exclude .git/ --exclude .htaccess --exclude .env --exclude config/jwt/ --exclude vendor/
+        mirror -R --delete ./ /lamp0/web/vhosts/prod-ps-api.gc2.fr/htdocs --exclude .git/ --exclude .htaccess --exclude var/ --exclude .env --exclude config/jwt/ --exclude vendor/
         bye
         "
