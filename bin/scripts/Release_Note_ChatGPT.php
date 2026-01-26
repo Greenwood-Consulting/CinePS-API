@@ -3,7 +3,7 @@ $apiKey = getenv('OPENAI_API_KEY');
 $ghKey = getenv('GITHUB_TOKEN');
 
 function call_API_POST_ChatGPT($json_body, $apiKey){
-    $curl = curl_init('https://api.openai.com/v1/chat/completions');
+    $curl = curl_init('https://api.openai.com/v1/responses');
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
       'Authorization: bearer '. $apiKey,
@@ -66,7 +66,7 @@ Voici maintenant le texte du git log sur lequel tu dois travailler : ".$git_log;
 
     $body = [
         'model' => 'gpt-5',
-        'messages' => [
+        'input' => [
             ['role' => 'user', 'content' => $prompt]
         ],
         'temperature' => 0.7
@@ -77,7 +77,7 @@ Voici maintenant le texte du git log sur lequel tu dois travailler : ".$git_log;
 
     $json_response = json_decode($api_response);
 
-    $release_note =  $json_response->choices[0]->message->content;
+    $release_note =  $json_response->output[0]->content[0]->text;
 
     // Créer un fichier temporaire
     $filePath = "RELEASE_NOTES.md";
