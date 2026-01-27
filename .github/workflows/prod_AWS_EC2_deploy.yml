@@ -23,9 +23,9 @@ jobs:
 
     - name: Upload files via SFTP
       run: |
-        lftp -f "
+        lftp <<EOF
         set sftp:connect-program 'ssh -a -x -i ~/.ssh/id_rsa'
         open -u ${{ secrets.PROD_AWS_EC2_USER }}, sftp://${{ secrets.PROD_AWS_EC2_HOST_IP }}
-        mirror -R --delete ./ /var/www/CinePS-API --exclude .git/ --exclude .htaccess --exclude .env --exclude config/jwt/ --exclude vendor/
+        mirror -R --delete ./ /var/www/CinePS-API --exclude-glob-from .lftp-exclude
         bye
-        "
+        EOF
