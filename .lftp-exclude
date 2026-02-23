@@ -1,0 +1,23 @@
+# fichiers/dossiers à ignorer lors du deploiement en preprod/prod
+# - ce qui est inutile pour le fonctionnement du serveur
+.env.test
+.git/**
+.gitignore
+.github/**
+.lftp-exclude
+composer.lock
+docs/**
+migrations/**
+phpunit.xml.dist
+README.md
+symfony.lock
+tests/**
+update_vendor.php
+
+# - ce qui ne doit pas être supprimé du serveur
+.env
+.htaccess
+config/jwt/**
+var/**
+vendor.zip
+vendor/**
