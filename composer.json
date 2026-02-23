@@ -22,6 +22,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.4.*",
         "symfony/http-client": "6.4.*",
+        "symfony/mailer": "6.4.*",
         "symfony/property-access": "6.4.*",
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
