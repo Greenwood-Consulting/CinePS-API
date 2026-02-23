@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CinePS — DB Schema Diff</title>
+
+  <!-- Diff2Html (CSS + JS) via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js"></script>
+
+  <!-- jsdiff (to generate a unified diff patch) -->
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; }
+    header { padding: 16px 18px; border-bottom: 1px solid #e5e7eb; }
+    h1 { font-size: 18px; margin: 0 0 6px; }
+    .sub { color: #6b7280; font-size: 13px; }
+    main { padding: 16px 18px; max-width: 1200px; margin: 0 auto; }
+
+    .grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+    @media (min-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; }
+    .dropzone {
+      border: 2px dashed #cbd5e1; border-radius: 12px; padding: 18px;
+      display: grid; gap: 10px; place-items: center; text-align: center;
+      background: #f8fafc;
+    }
+    .dropzone.drag { border-color: #2563eb; background: #eff6ff; }
+    .fileline { font-size: 13px; color: #111827; }
+    .muted { color: #6b7280; font-size: 12px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button {
+      border: 1px solid #e5e7eb; background: #111827; color: #fff;
+      padding: 9px 12px; border-radius: 10px; cursor: pointer; font-weight: 600;
+    }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-secondary { background: #fff; color: #111827; }
+    .opts { display: grid; gap: 8px; }
+    label { display:flex; gap:8px; align-items:center; font-size: 13px; color:#111827; }
+    input[type="checkbox"] { transform: scale(1.1); }
+    .small { font-size: 12px; color:#6b7280; }
+
+    #status { margin-top: 12px; font-size: 13px; color: #111827; }
+    #diff { margin-top: 14px; }
+    .footer { margin-top: 18px; color:#6b7280; font-size:12px; }
+    code { background: #f3f4f6; padding: 1px 6px; border-radius: 6px; }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>CinePS — DB Schema Diff (local)</h1>
+  <div class="sub">Glisse-dépose 2 exports SQL (structure). Normalisation + diff complet + rendu rouge/vert type GitHub.</div>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin:0 0 10px; font-size:14px;">Fichiers</h2>
+
+      <div class="dropzone" id="dz">
+        <div>
+          <div style="font-weight:700;">Glisse-dépose ici tes 2 fichiers .sql</div>
+          <div class="muted">ou clique pour sélectionner</div>
+        </div>
+        <input id="fileInput" type="file" accept=".sql,.txt" multiple style="display:none" />
+        <div class="row">
+          <button class="btn-secondary" id="chooseBtn" type="button">Choisir des fichiers</button>
+          <button id="runBtn" type="button" disabled>Générer le diff</button>
+          <button class="btn-secondary" id="resetBtn" type="button">Réinitialiser</button>
+        </div>
+        <div class="fileline" id="fileA">A: —</div>
+        <div class="fileline" id="fileB">B: —</div>
+        <div class="muted" id="sizes">—</div>
+      </div>
+
+      <div id="status"></div>
+
+      <div class="footer">
+        Astuce: exports phpMyAdmin “Structure uniquement”, sans données.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px; font-size:14px;">Normalisation</h2>
+
+      <div class="opts">
+        <label><input type="checkbox" id="optComments" checked> Supprimer commentaires <span class="small">(pour le diff)</span></label>
+        <label><input type="checkbox" id="optDoctrine" checked> Ignorer <code>doctrine_migration_versions</code></label>
+        <label><input type="checkbox" id="optCollation" checked> Supprimer <code>COLLATE</code> et <code>CHARACTER SET</code></label>
+        <label><input type="checkbox" id="optAutoInc" checked> Normaliser <code>AUTO_INCREMENT</code></label>
+        <label><input type="checkbox" id="optDefiner" checked> Normaliser <code>DEFINER</code></label>
+      </div>
+
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:12px 0">
+
+      <div class="opts">
+        <label><input type="checkbox" id="optFullContext" checked> Diff complet (tout le fichier)</label>
+        <label><input type="checkbox" id="optLineMode" checked> Vue unifiée 1 colonne</label>
+      </div>
+
+      <div class="footer">
+        Tout est local dans ton navigateur : aucun upload serveur.
+      </div>
+    </div>
+  </div>
+
+  <div id="diff"></div>
+</main>
+
+<script>
+  // ---------- State ----------
+  let fileA = null;
+  let fileB = null;
+  let textA = "";
+  let textB = "";
+
+  const els = {
+    dz: document.getElementById("dz"),
+    fileInput: document.getElementById("fileInput"),
+    chooseBtn: document.getElementById("chooseBtn"),
+    runBtn: document.getElementById("runBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    fileALabel: document.getElementById("fileA"),
+    fileBLabel: document.getElementById("fileB"),
+    sizes: document.getElementById("sizes"),
+    status: document.getElementById("status"),
+    diff: document.getElementById("diff"),
+
+    optComments: document.getElementById("optComments"),
+    optDoctrine: document.getElementById("optDoctrine"),
+    optCollation: document.getElementById("optCollation"),
+    optAutoInc: document.getElementById("optAutoInc"),
+    optDefiner: document.getElementById("optDefiner"),
+    optFullContext: document.getElementById("optFullContext"),
+    optLineMode: document.getElementById("optLineMode"),
+  };
+
+  // ---------- Helpers ----------
+  function setStatus(msg) { els.status.textContent = msg; }
+  function bytes(n) {
+    const units = ["B","KB","MB","GB"];
+    let i=0, x=n;
+    while (x>=1024 && i<units.length-1) { x/=1024; i++; }
+    return `${x.toFixed(i?2:0)} ${units[i]}`;
+  }
+
+  function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result || ""));
+      r.onerror = () => reject(r.error);
+      r.readAsText(file);
+    });
+  }
+
+  // ---------- Normalization ----------
+  function normalize(sql) {
+    // Normalize line endings
+    let s = sql.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    if (els.optComments.checked) {
+      // Remove /* ... */ multiline comments
+      s = s.replace(/\/\*[\s\S]*?\*\//g, "");
+      // Remove -- ... end-of-line comments
+      s = s.replace(/^\s*--.*$/gm, "");
+      // Remove # ... end-of-line comments
+      s = s.replace(/^\s*#.*$/gm, "");
+    }
+
+    if (els.optDoctrine.checked) {
+      // Remove any CREATE/ALTER/DROP statements for doctrine_migration_versions.
+      // This is a line-based approach good for dumps.
+      const lines = s.split("\n");
+      const out = [];
+      let skipping = false;
+
+      for (let line of lines) {
+        const lower = line.toLowerCase();
+
+        // phpMyAdmin header line (if comments kept)
+        if (lower.includes("structure de la table") && lower.includes("`doctrine_migration_versions`")) {
+          continue;
+        }
+
+        const isStart =
+          /^\s*create\s+table\s+`doctrine_migration_versions`/i.test(line) ||
+          /^\s*alter\s+table\s+`doctrine_migration_versions`/i.test(line) ||
+          /^\s*drop\s+table\s+(if\s+exists\s+)?`doctrine_migration_versions`/i.test(line);
+
+        if (!skipping && isStart) {
+          skipping = true;
+          if (line.includes(";")) skipping = false;
+          continue;
+        }
+
+        if (skipping) {
+          if (line.includes(";")) skipping = false;
+          continue;
+        }
+
+        out.push(line);
+      }
+
+      s = out.join("\n");
+    }
+
+    if (els.optDefiner.checked) {
+      // Normalize DEFINER=`user`@`host` (views/triggers)
+      s = s.replace(/DEFINER=`[^`]+`@`[^`]+`/g, "DEFINER=`_`@`_`");
+    }
+
+    if (els.optAutoInc.checked) {
+      s = s.replace(/AUTO_INCREMENT=\d+/g, "AUTO_INCREMENT=0");
+    }
+
+    if (els.optCollation.checked) {
+      s = s.replace(/\s+COLLATE\s+[^\s,]+/gi, "");
+      s = s.replace(/\s+CHARACTER\s+SET\s+[^\s,]+/gi, "");
+    }
+
+    // Trim trailing spaces + remove empty lines
+    s = s.split("\n").map(l => l.replace(/\s+$/g, "")).filter(l => l.trim() !== "").join("\n");
+
+    return s;
+  }
+
+  // ---------- Diff generation ----------
+  function buildPatch(aName, bName, aText, bText) {
+    // jsdiff supports “context” lines. We want full file => huge context.
+    const context = els.optFullContext.checked ? 999999 : 3;
+
+    // Using structuredPatch gives us a unified diff string.
+    const patch = Diff.structuredPatch(
+      aName, bName,
+      aText, bText,
+      "", "", // oldHeader/newHeader optional
+      { context }
+    );
+    return Diff.formatPatch(patch);
+  }
+
+  function renderDiff(patch) {
+    els.diff.innerHTML = "";
+
+    const outputFormat = els.optLineMode.checked ? "line-by-line" : "side-by-side";
+
+    const html = Diff2Html.html(patch, {
+      drawFileList: true,
+      matching: "none",
+      outputFormat,
+      diffStyle: outputFormat === "line-by-line" ? "word" : "word",
+    });
+
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    els.diff.appendChild(container);
+
+    // Scroll to top of diff
+    container.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---------- UI events ----------
+  async function handleFiles(files) {
+    const arr = Array.from(files || []).filter(f => f && f.size >= 0);
+    if (arr.length < 2) {
+      setStatus("Ajoute 2 fichiers (.sql).");
+      return;
+    }
+
+    fileA = arr[0];
+    fileB = arr[1];
+
+    els.fileALabel.textContent = `A: ${fileA.name}`;
+    els.fileBLabel.textContent = `B: ${fileB.name}`;
+    els.sizes.textContent = `Tailles: ${bytes(fileA.size)} + ${bytes(fileB.size)}`;
+
+    setStatus("Lecture des fichiers...");
+    els.runBtn.disabled = true;
+
+    try {
+      [textA, textB] = await Promise.all([readFileAsText(fileA), readFileAsText(fileB)]);
+      setStatus("Prêt. Clique sur “Générer le diff”.");
+      els.runBtn.disabled = false;
+    } catch (e) {
+      console.error(e);
+      setStatus("Erreur lecture fichiers.");
+    }
+  }
+
+  els.chooseBtn.addEventListener("click", () => els.fileInput.click());
+  els.fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
+
+  els.resetBtn.addEventListener("click", () => {
+    fileA = fileB = null;
+    textA = textB = "";
+    els.fileInput.value = "";
+    els.fileALabel.textContent = "A: —";
+    els.fileBLabel.textContent = "B: —";
+    els.sizes.textContent = "—";
+    els.diff.innerHTML = "";
+    setStatus("Réinitialisé. Glisse-dépose 2 fichiers.");
+    els.runBtn.disabled = true;
+  });
+
+  els.runBtn.addEventListener("click", () => {
+    if (!fileA || !fileB) return;
+
+    setStatus("Normalisation...");
+    const aNorm = normalize(textA);
+    const bNorm = normalize(textB);
+
+    setStatus("Génération du patch...");
+    const patch = buildPatch(fileA.name + " (norm)", fileB.name + " (norm)", aNorm, bNorm);
+
+    setStatus("Rendu HTML...");
+    renderDiff(patch);
+
+    setStatus("OK.");
+  });
+
+  // Drag & drop UX
+  ["dragenter","dragover"].forEach(evt => {
+    els.dz.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      els.dz.classList.add("drag");
+    });
+  });
+  ["dragleave","drop"].forEach(evt => {
+    els.dz.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      els.dz.classList.remove("drag");
+    });
+  });
+  els.dz.addEventListener("drop", (e) => handleFiles(e.dataTransfer.files));
+  els.dz.addEventListener("click", (e) => {
+    // Allow click on the zone (except buttons)
+    if (e.target.tagName.toLowerCase() === "button") return;
+    els.fileInput.click();
+  });
+
+  setStatus("Glisse-dépose 2 fichiers pour commencer.");
+</script>
+</body>
+</html>
