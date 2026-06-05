@@ -26,6 +26,7 @@ ENV APP_ENV=prod \
 COPY composer.json composer.lock ./
 
 RUN composer install \
+    --no-scripts \
     --no-dev \
     --no-interaction \
     --prefer-dist \
